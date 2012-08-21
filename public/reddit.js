@@ -45,12 +45,14 @@ function createImage( listView, img ) {
 	$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
-	    		//div = $('<div />');
-	    		
-	    		//div.append(this);
-	    		//listView.append(div);
-	    		listView.append($("<h1>" + img.title + "</h1>"));
-				listView.append($(this));
+
+	    		// TOOD: Better jQuery way to construct/add this?
+	    		listView.append($(	'<p><div class="matte-media-box pug-box">' + 
+									'<p>' + img.title + '</p>'+
+									'<img src=' + img.url + '>' +
+									'</div></p>' ))
+//	    		listView.append($("<h1>" + img.title + "</h1>"));
+//				listView.append($(this));
 
 				if( undefined != cbURLs[img.url] ) { console.log( img.url, ": in the callback after loading - duplicate seen!: ", img.url); }
 				cbURLs[img.url] = true;

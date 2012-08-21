@@ -1,12 +1,14 @@
+img {
+  display: inline-block;
+}
+
+body {
+font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
 
 .pug-box {
   position: relative;
-  width: 100%;
   margin-bottom: 50px;
-}
-.pug-box:hover {
-  box-shadow: 0px 0px 5px 1px #EE71BA;
-  border-color: #EE71BA;
 }
 .pug-box .caption {
   padding-right: 70px;
@@ -22,5 +24,3 @@
 .matte-media-box .caption{padding:7px 8px;line-height:1em}
 
 .matte-media-box.small{padding:2px}a 
-.matte-media-box{border:1px solid #d0d0d0}a:hover 
-.matte-media-box,a:hover 
