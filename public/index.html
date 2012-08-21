@@ -42,14 +42,7 @@ http://airbnb.github.com/infinity/assets/js/demo/render.js
 $(document).ready(function(){
    // Your code here
 var $el = $('#demo');
-var listView = new infinity.ListView($el,
-{
-        lazy: function() {
-          console.log("lazy called!")
-        }
-
-}
-  );
+var listView = new infinity.ListView($el);
 /* 
       var $newContent = $("<h1>Junk1</h1>")
       listView.append($newContent);
