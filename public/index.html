@@ -6,13 +6,6 @@
     <title>Infinite Reddit</title>
   </head>
   <body>
-<!--They have 3 verticaal cols in the demo
-http://airbnb.github.com/infinity/assets/js/demo/render.js
--->
-
-
-
-
     <script type=text/javascript src=underscore.js></script>
 
     <script type=text/javascript src=jquery-1.8.0.js></script>
@@ -40,32 +33,8 @@ http://airbnb.github.com/infinity/assets/js/demo/render.js
 
 
 $(document).ready(function(){
-   // Your code here
-var $el = $('#demo');
-var listView = new infinity.ListView($el);
-/* 
-      var $newContent = $("<h1>Junk1</h1>")
-      listView.append($newContent);
-      var $newContent = $("<h1>Junk2</h1>")
-      listView.append($newContent);
-      var $newContent = $("<h1>Junk3</h1>")
-      listView.append($newContent);
-      var $newContent = $("<h1>Junk4</h1>")
-      listView.append($newContent);
-*/
-
-
-// ... When adding new content:
-//var $newContent = $('<img src=a.jpeg>');
-//listView.append($newContent);
-// a == b oops
-
-/*for (var i = picsJson.length - 1; i >= 0; i--) {
-  here = picsJson[i].data;
-  var $newContent = $('<p><h3>'+ i + ': ' + here.title + '</h3><img src=' + here.url + '></p>')
-listView.append($newContent);
-};
-*/
+  var $el = $('#demo');
+  var listView = new infinity.ListView($el);
 
   !function() {
 
@@ -99,7 +68,7 @@ listView.append($newContent);
 
 getReddits( ["gaming", "starcraft"], listView)
 
-// end init
+// end document ready
  });
 </script>
 
