@@ -1,0 +1,8 @@
+{
+ "name": "infinite-reddit",
+ "version": "0.0.1",
+ "dependencies":{
+   "ejs":"",
+   "express":""
+ }
+}
