@@ -1,0 +1,117 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>Infinite Reddit</title>
+  </head>
+  <body>
+<!--They have 3 verticaal cols in the demo
+http://airbnb.github.com/infinity/assets/js/demo/render.js
+-->
+
+
+
+
+    <script type=text/javascript src=underscore.js></script>
+
+    <script type=text/javascript src=jquery-1.8.0.js></script>
+    <script type=text/javascript src=infinity.js></script>
+    <script type=text/javascript src=reddit.js></script>
+
+    <div class='container main-container'> 
+      <div id=demo class=row>
+        <div class=span4>
+          <div class=row-fluid>
+            <div class='list-view'>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type=text/html id=spinner-template>
+      <div class=row>
+        <div class=span12> Loading more images...
+          <img src=spinner.gif class=spinner alt='Loading...'>
+        </div>
+      </div>
+    </script>
+<script type=text/javascript>
+
+
+$(document).ready(function(){
+   // Your code here
+var $el = $('#demo');
+var listView = new infinity.ListView($el,
+{
+        lazy: function() {
+          console.log("lazy called!")
+        }
+
+}
+  );
+/* 
+      var $newContent = $("<h1>Junk1</h1>")
+      listView.append($newContent);
+      var $newContent = $("<h1>Junk2</h1>")
+      listView.append($newContent);
+      var $newContent = $("<h1>Junk3</h1>")
+      listView.append($newContent);
+      var $newContent = $("<h1>Junk4</h1>")
+      listView.append($newContent);
+*/
+
+
+// ... When adding new content:
+//var $newContent = $('<img src=a.jpeg>');
+//listView.append($newContent);
+// a == b oops
+
+/*for (var i = picsJson.length - 1; i >= 0; i--) {
+  here = picsJson[i].data;
+  var $newContent = $('<p><h3>'+ i + ': ' + here.title + '</h3><img src=' + here.url + '></p>')
+listView.append($newContent);
+};
+*/
+
+  !function() {
+
+    var spinnerTemplate = _.template($('#spinner-template').html());
+
+    var spinner = $(spinnerTemplate());
+    var updateScheduled = false;
+    function onscreen($el) {
+      var viewportBottom = $(window).scrollTop() + $(window).height();
+      console.log( "vbp: ", viewportBottom, " <= eloffset.top", $el.offset().top, " = ", $el.offset().top <= viewportBottom )
+      return $el.offset().top <= viewportBottom;
+    }
+
+    spinner.insertAfter($('#demo').closest('.row'));
+    $(window).on('scroll', function() {
+      if(!updateScheduled) {
+        setTimeout(function() {
+          if(onscreen(spinner)) {
+            console.log("Scrolltime!") 
+            getReddits( ["gaming", "starcraft"], listView )
+            // if the spinner is visible them presumably you've reached the bottom of the page
+          }
+
+          updateScheduled = false;
+        }, 500);
+        updateScheduled = true;
+      }
+    });
+  }();
+
+
+getReddits( ["gaming", "starcraft"], listView)
+
+// end init
+ });
+</script>
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,97 @@
+    <script type=text/javascript src=jquery-1.8.0.js></script>
+    <script type=text/javascript src=infinity.js></script>
+
+<script>
+// Create the XHR object.
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // XHR for Chrome/Safari/Firefox.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // XDomainRequest for IE.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
+}
+
+// Helper method to parse the title tag from the response.
+function getTitle(text) {
+  return text.match('<title>(.*)?</title>')[1];
+}
+
+// Make the actual CORS request.
+function makeCorsRequest() {
+  // bibliographica.org supports CORS.
+  var url = 'http://reddit.com/';
+
+  var xhr = createCORSRequest('GET', url);
+  if (!xhr) {
+    alert('CORS not supported');
+    return;
+  }
+
+  // Response handlers.
+  xhr.onload = function() {
+    var text = xhr.responseText;
+    var title = getTitle(text);
+    alert('Response from CORS request to ' + url + ': ' + title);
+  };
+
+  xhr.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+
+  xhr.send();
+}
+
+//makeCorsRequest()
+
+console.log("sending the json")
+$.getJSON("http://www.reddit.com/r/Starcraft+gaming/.json?jsonp=?", function(data) { 
+	console.log( "GOT A RESPONSE!" )
+    $.each(data.data.children, function(i,item){
+    	console.log( item.data.url)
+//        $("<img/>").attr("src", item.data.url).appendTo("#images");
+    });
+});
+
+
+
+
+  !function() {
+//    var spinner = $(spinnerTemplate());
+    var updateScheduled = false;
+    function onscreen($el) {
+      var viewportBottom = $(window).scrollTop() + $(window).height();
+      return $el.offset().top <= viewportBottom;
+    }
+    spinner.insertAfter($('#demo').closest('.row'));
+    $(window).on('scroll', function() {
+      if(!updateScheduled) {
+        setTimeout(function() {
+          if(onscreen(spinner)) Pug.bomb(100);
+          updateScheduled = false;
+        }, 500);
+        updateScheduled = true;
+      }
+    });
+  }();
+
+
+
+</script>
+
+
+
+    <script type=text/html id=spinner-template>
+      <div class=row>
+        <div class=span12>
+          <img src=assets/images/icons/spinner.gif class=spinner alt='Loading...'>
+        </div>
+      </div>
+    </script>
