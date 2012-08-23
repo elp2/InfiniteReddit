@@ -45,11 +45,20 @@ function createImage( listView, img ) {
 	$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
+	    		imgTag = '<img src=' + img.url;
 
+	    		scaledWidth = this.width;
+	    		maxWidth = $(window).width() - 30
+	    		scaledWidth = Math.min(maxWidth, this.width);
+	    		scaledHeight = this.height * ( scaledWidth / this.width )
+	    		console.log( "mw: ", maxWidth, "! sw: ", scaledWidth, ", sh = ", scaledHeight)
+
+	    		imgTag = imgTag + " width=" + scaledWidth+ " height=" + scaledHeight
+	    		imgTag = imgTag + ' >';
 	    		// TOOD: Better jQuery way to construct/add this?
 	    		listView.append($(	'<p><div class="matte-media-box pug-box">' + 
 									'<p>' + img.title + '</p>'+
-									'<img src=' + img.url + '>' +
+									imgTag +
 									'</div></p>' ))
 
 				if( undefined != cbURLs[img.url] ) { console.log( img.url, ": in the callback after loading - duplicate seen!: ", img.url); }
