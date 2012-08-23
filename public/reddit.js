@@ -51,23 +51,10 @@ function createImage( listView, img ) {
 									'<p>' + img.title + '</p>'+
 									'<img src=' + img.url + '>' +
 									'</div></p>' ))
-//	    		listView.append($("<h1>" + img.title + "</h1>"));
-//				listView.append($(this));
 
 				if( undefined != cbURLs[img.url] ) { console.log( img.url, ": in the callback after loading - duplicate seen!: ", img.url); }
 				cbURLs[img.url] = true;
 	    });
-/*
-	var $newContent = $('<div>' +
-		//'<h3>'+ i + ': ' + here.title + '</h3>' +
-		'<img src=' + here.url  +
-		// note that not specifying the heights upfront seems to screw up where the spinner goes!  
-		'width=100 height=100'+
-		'>' +
-		'</div>')
-	listView.append($newContent);
-	*/
-
 }
 
 function getReddits(subreddits, listView ) {
