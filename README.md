@@ -6,3 +6,4 @@ Goals:
 * Don't show partially downloaded images
 * Keyboard navigation
 * Works on Chrome (OSX) / Firefox (OSX) / Chrome (Android) / Safari (IOS+OSX)
+* JavaScript Test Cases
