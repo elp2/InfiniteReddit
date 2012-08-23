@@ -30,8 +30,6 @@
       </div>
     </script>
 <script type=text/javascript>
-
-
 $(document).ready(function(){
   var $el = $('#demo');
   var listView = new infinity.ListView($el);
@@ -54,7 +52,7 @@ $(document).ready(function(){
         setTimeout(function() {
           if(onscreen(spinner)) {
             console.log("Scrolltime!") 
-            getReddits( ["gaming", "starcraft"], listView )
+            getReddits( reddits, listView )
             // if the spinner is visible them presumably you've reached the bottom of the page
           }
 
@@ -66,7 +64,16 @@ $(document).ready(function(){
   }();
 
 
-getReddits( ["gaming", "starcraft"], listView)
+function getSubreddits() {  
+  reddits = window.location.toString().split("?")[1];
+  if(undefined == reddits )
+    return(["all"])
+
+  return(reddits.split("+"))
+}
+
+reddits = getSubreddits();
+getReddits( reddits, listView)
 
 // end document ready
  });
