@@ -20,12 +20,14 @@ function urlForSubreddits(subreddits, after ) {
 }
 
 function getImage(item) {
+	console.log("Parsing: ", item.url)
 	if(!shouldShowImage(item))
 		return undefined
 
 	if( !item.url.endsWith("png") && !item.url.endsWith("jpg") && !item.url.endsWith("jpeg") )
 		return undefined
 
+	console.log("showing: ", item.url)
 	return item
 }
 
@@ -41,14 +43,25 @@ function skippedOver18(item) {
 	numOver18Skipped++;
 }
 
+function nonImageExtension(item) {
+	console.log("Unhandleable url: ", item.url)
+}
+
 function shouldShowImage(item) {
 	if(undefined == item)
 		return false
+
+	if(!item.url.endsWith("png") && !item.url.endsWith("jpg") && !item.url.endsWith("jpeg")){
+		nonImageExtension(item);
+		return false
+	}
+
 	if(true == item.over_18 && !showOver18) {
 		skippedOver18(item);
 		return false;
 	}
 
+	return true
 }
 
 function createImage( listView, img ) {
