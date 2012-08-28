@@ -19,12 +19,21 @@ function urlForSubreddits(subreddits, after ) {
 	return url
 }
 
+function isImageExtension(url) {
+	imageExtensions = [ "png", "jpeg", "jpg", "gif" ];
+	for (var i = 0; i < imageExtensions.length; i++) {
+		if(url.toLowerCase().endsWith(imageExtensions[i]))
+			return(true);
+	};
+	return(false);	
+}
+
 function getImage(item) {
 	console.log("Parsing: ", item.url)
 	if(!shouldShowImage(item))
 		return undefined
 
-	if( !item.url.endsWith("png") && !item.url.endsWith("jpg") && !item.url.endsWith("jpeg") )
+	if(!isImageExtension(item.url))
 		return undefined
 
 	console.log("showing: ", item.url)
@@ -50,11 +59,6 @@ function nonImageExtension(item) {
 function shouldShowImage(item) {
 	if(undefined == item)
 		return false
-
-	if(!item.url.endsWith("png") && !item.url.endsWith("jpg") && !item.url.endsWith("jpeg")){
-		nonImageExtension(item);
-		return false
-	}
 
 	if(true == item.over_18 && !showOver18) {
 		skippedOver18(item);
