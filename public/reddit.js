@@ -24,6 +24,9 @@ function getImage(item) {
 	if(!shouldShowImage(item))
 		return undefined
 
+	if( !item.url.endsWith("png") && !item.url.endsWith("jpg") && !item.url.endsWith("jpeg") )
+		return undefined
+
 	console.log("showing: ", item.url)
 	return item
 }
@@ -41,19 +44,14 @@ function skippedOver18(item) {
 }
 
 function nonImageExtension(item) {
-	console.log("Can't handle URL: ", item.url)
+	console.log("Unhandleable url: ", item.url)
 }
 
 function shouldShowImage(item) {
 	if(undefined == item)
 		return false
 
-	imageExtensions = [ "png", "jpg", "jpeg", "gif" ];
-	hasImageExtension = false;
-	for (var i = imageExtensions.length - 1; i >= 0; i--) {
-		hasImageExtension = item.url.toLowerCase().endsWith(imageExtensions[i]) || hasImageExtension;
-	};
-	if(!hasImageExtension) {
+	if(!item.url.endsWith("png") && !item.url.endsWith("jpg") && !item.url.endsWith("jpeg")){
 		nonImageExtension(item);
 		return false
 	}
@@ -74,7 +72,7 @@ function createImage( listView, img ) {
 
 	seenURLs[img.url] = true;
 
-	console.log("Creating Image CB for:", img.url)
+	console.log("adding2: ", img.url)
 	// Insert preloaded image after it finishes loading
 	$('<img />')
 	    .attr('src', img.url)
@@ -85,42 +83,34 @@ function createImage( listView, img ) {
 	    		maxWidth = $(window).width() - 30
 	    		scaledWidth = Math.min(maxWidth, this.width);
 	    		scaledHeight = this.height * ( scaledWidth / this.width )
-
+	    		console.log( "mw: ", maxWidth, "! sw: ", scaledWidth, ", sh = ", scaledHeight)
 
 	    		imgTag = imgTag + " width=" + scaledWidth+ " height=" + scaledHeight
 	    		imgTag = imgTag + ' >';
 	    		// TOOD: Better jQuery way to construct/add this?
-	    		// TODO: Make headers wrap properly
-	    		listView.append($(	
-	    			'<div class="matte-media-box pug-box>' + 
-									'<h4>' + img.title + '</h4>'+
+	    		listView.append($(	'<p><div class="matte-media-box pug-box">' + 
+									'<p>' + img.title + '</p>'+
 									imgTag +
-									'</div>' 
-									))
+									'</div></p>' ))
 
-				if( undefined != cbURLs[img.url] ) { console.error( img.url, ": in the callback after loading - duplicate seen!"); }
+				if( undefined != cbURLs[img.url] ) { console.log( img.url, ": in the callback after loading - duplicate seen!: ", img.url); }
 				cbURLs[img.url] = true;
 	    });
 }
 
-maxAddedImages = 2;
-addedImg = 0;
 function getReddits(subreddits, listView ) {
 	url = urlForSubreddits(subreddits, redditAfterTag)
 	console.log("sending the json - after = ", redditAfterTag )
 	$.getJSON(url, function(data) { 
 		redditAfterTag = data.data.after;
 		// TODO: possible for after to become empty after a while ... "after": null, "before": null
-		console.log("Got ", data.data.children.length, " children.  After=", redditAfterTag);
+
+		console.log( "Got data! #= ", data.data.children.length )
 
 	    $.each(data.data.children, function(i,item){
-
 	    	here = item.data
 	    	var img = getImage( here )
-	    	if(img&& addedImg < maxAddedImages) {
-		    	createImage(listView, img)
-		    	addedImg++;
-			}
+	    	createImage(listView, img)
 	    });
     })
 }
