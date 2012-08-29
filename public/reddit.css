@@ -1,9 +1,17 @@
 img {
-  display: inline-block;
 }
 
 body {
 font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.redditImage {
+  padding:3px;border-style:solid;border-width:1px;border-color:#ddd #cacaca #acacac;
+  line-height:0;
+  display:inline-block;
+  background-color:#fff;position:relative;-webkit-border-radius:2px;
+  -moz-border-radius:2px;border-radius:2px;-webkit-box-shadow:0 4px 2px -2px rgba(0,0,0,0.1),0 0 0 #000;
+  -moz-box-shadow:0 4px 2px -2px rgba(0,0,0,0.1),0 0 0 #000;box-shadow:0 4px 2px -2px rgba(0,0,0,0.1),0 0 0 #000;
 }
 
 .pug-box {
@@ -30,4 +38,4 @@ display:inline-block;
 
 .matte-media-box .caption{padding:7px 8px;line-height:1em}
 
-.matte-media-box.small{padding:2px}a 
+.matte-media-box.small{padding:2px}
