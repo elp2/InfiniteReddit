@@ -53,8 +53,13 @@ function getImage(item) {
 
 redditAfterTag = ""
 
-seenURLs = {}
-cbURLs = {}
+function getSeenURLs() {
+	// TODO: actually read from local system
+
+	return {};
+}
+
+seenURLs = getSeenURLs();
 
 showOver18 = false;
 numOver18Skipped = 0;
@@ -92,27 +97,14 @@ function createImage( listView, img ) {
 	$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
-	    		imgTag = '<img src=' + img.url;
+			scaledWidth = this.width;
+			maxWidth = $(window).width() - 30
+			img.scaledWidth = Math.min(maxWidth, this.width);
+			img.scaledHeight = this.height * ( scaledWidth / this.width )
 
-	    		scaledWidth = this.width;
-	    		maxWidth = $(window).width() - 30
-	    		scaledWidth = Math.min(maxWidth, this.width);
-	    		scaledHeight = this.height * ( scaledWidth / this.width )
+			imageDiv = imageTemplate(img);
 
-	    		imgTag = imgTag + " width=" + scaledWidth+ " height=" + scaledHeight
-	    		imgTag = imgTag + ' >';
-	    		// TOOD: Better jQuery way to construct/add this?
-
-	    		//NOTE: <P></P> at the beginning/end outside of div end up screwing up the spinner
-	    		listView.append($(	"<div class='redditImage'><h4>" + img.title + "</h4>" + imgTag + "</div>"
-	    			//'<p><div class="matte-media-box pug-box">' + 
-					//				'<p>' + img.title + '</p>'+
-					//				imgTag +
-					//				'</div></p>' 
-									))
-
-				if( undefined != cbURLs[img.url] ) { console.log( img.url, ": in the callback after loading - duplicate seen!: ", img.url); }
-				cbURLs[img.url] = true;
+			listView.append($(imageDiv));
 	    });
 }
 

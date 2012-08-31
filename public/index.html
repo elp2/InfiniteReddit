@@ -30,10 +30,27 @@
         </div>
       </div>
     </script>
+
+    <!-- NOTE: <P></P> at the beginning/end outside of div end up screwing up the spinner -->
+    <script type=text/html id=image-template>
+      <div class='reddit-image'>
+        <h4>{{title}}</h4>
+        <div class='reddit-image-about'>
+        By <div class='image-author'>{{ author }}</div> at <div class='image-created'>{{ created }} on <div class='image-subreddit'>{{ subreddit}}</div>
+        </div>
+        <img src={{ url }} width={{ scaledWidth }} height={{ scaledHeight }}/>
+      </div>
+    </script>
+
 <script type=text/javascript>
 $(document).ready(function(){
   var $el = $('#demo');
   var listView = new infinity.ListView($el);
+
+  templateSettings = {
+    interpolate : /\{\{(.+?)\}\}/g
+  };
+  imageTemplate = _.template($('#image-template').html(), false, templateSettings );//false, { interpolate : /\{\{(.+?)\}\}/g } );
 
   !function() {
 
