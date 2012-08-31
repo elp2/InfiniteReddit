@@ -50,35 +50,28 @@
 <script type=text/javascript>
 $(document).ready(function(){
   var $el = $('#demo');
-  var listView = new infinity.ListView($el);
+  listView = new infinity.ListView($el);
 
-  templateSettings = {
-    interpolate : /\{\{(.+?)\}\}/g
-  };
-  imageTemplate = _.template($('#image-template').html(), false, templateSettings );//false, { interpolate : /\{\{(.+?)\}\}/g } );
+  var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
+  imageTemplate = _.template($('#image-template').html(), false, templateSettings );
 
   !function() {
-
-    var spinnerTemplate = _.template($('#spinner-template').html());
-
-    var spinner = $(spinnerTemplate());
+    var spinner = $($('#spinner-template').html());
     var updateScheduled = false;
-    function onscreen($el) {
-      var viewportBottom = $(window).scrollTop() + $(window).height();
-      console.log( "vbp: ", viewportBottom, " <= eloffset.top", $el.offset().top, " = ", $el.offset().top <= viewportBottom )
-      isOnscreen = $el.offset().top <= viewportBottom;
-      return isOnscreen;
-    }
 
     spinner.insertAfter($('#demo').closest('.row'));
+
+    function onscreen($el) {
+      var viewportBottom = $(window).scrollTop() + $(window).height();
+      return  $el.offset().top <= viewportBottom;
+    }
+
     $(window).on('scroll', function() {
       if(!updateScheduled) {
         setTimeout(function() {
-          if(onscreen(spinner)) {
-            getReddits( reddits, listView )
-            // if the spinner is visible them presumably you've reached the bottom of the page
+          if(onscreen(spinner)) { 
+            getReddits( reddits, listView )           
           }
-
           updateScheduled = false;
         }, 500);
         updateScheduled = true;
@@ -87,7 +80,7 @@ $(document).ready(function(){
   }();
 
 function getSubreddits() {  
-  reddits = window.location.toString().split("?")[1];
+  var reddits = window.location.toString().split("?")[1];
   if(undefined == reddits )
     return(["all"])
   return(reddits.split("+"))
@@ -95,8 +88,8 @@ function getSubreddits() {
 
 //TODO: remove when offline done
 setTimeout(function(){ 
-reddits = getSubreddits();
-getReddits( reddits, listView)
+  var subReddits = getSubreddits();
+  getReddits(subReddits)
 }, 500);
 
 // end document ready

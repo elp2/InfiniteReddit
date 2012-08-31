@@ -1,3 +1,7 @@
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 testingJson = {
 "kind": "Listing", "data": {"modhash": "", "children": [
 {"kind": "t3", "data": {"domain": "imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "yzys5", "clicked": false, "title": "Found a strawBEARy!", "num_comments": 277, "score": 2141, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://f.thumbs.redditmedia.com/HNzAVvyLCx8ZidvG.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 6498, "saved": false, "is_self": false, "permalink": "/r/pics/comments/yzys5/found_a_strawbeary/", "name": "t3_yzys5", "created": 1346233214.0, "url": "test/1.jpeg", "author_flair_text": null, "author": "Taybow", "created_utc": 1346208014.0, "media": null, "num_reports": null, "ups": 8639}},
@@ -8,12 +12,6 @@ testingJson = {
 
   ], "after": "t3_yyv33", "before": null}}
 
-
-String.prototype.endsWith = function(suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
-
-
 offlineMode = true;
 
 function urlForSubreddits(subreddits, after ) {
@@ -21,13 +19,13 @@ function urlForSubreddits(subreddits, after ) {
 	redditsURLBase = "http://www.reddit.com/r/"
 	redditURLJsonEnding = "/.json?jsonp=?"
 
-	url = redditsURLBase
+	var url = redditsURLBase
 	url = url + subreddits.join("+") 
 	url = url + redditURLJsonEnding
 	if( after.length > 0 )
 		url = url + "&after=" + after
 
-	console.log("URL=", url)		
+	console.log("Getting URL=", url)		
 }
 
 function isImageExtension(url) {
@@ -84,7 +82,7 @@ function shouldShowImage(item) {
 	return true
 }
 
-function createImage( listView, img ) {
+function createImage( img ) {
 
 	// moving into its own function seems to have resolved an issue where img would become undefined in the CB
 	if(undefined == img || undefined != seenURLs[img.url])
@@ -97,40 +95,40 @@ function createImage( listView, img ) {
 	$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
-			scaledWidth = this.width;
-			maxWidth = $(window).width() - 30
+			var scaledWidth = this.width;
+			var maxWidth = $(window).width() - 30
 			img.scaledWidth = Math.min(maxWidth, this.width);
 			img.scaledHeight = this.height * ( scaledWidth / this.width )
 
-			imageDiv = imageTemplate(img);
+			var imageDiv = imageTemplate(img);
 
 			listView.append($(imageDiv));
 	    });
 }
 
-function addAllImages(data, listView) {
+function addAllImages(data) {
     $.each(data.data.children, function(i,item){
-    	here = item.data
+    	var here = item.data
     	var img = getImage( here )
-    	createImage(listView, img)
+    	createImage(img)
     });
 }
 
-function getRedditData(url, listView) {
-	if(offlineMode) { addAllImages(testingJson,listView) }
+function getRedditData(url) {
+	if(offlineMode) { addAllImages(testingJson) }
 	else {
 		$.getJSON(url, function(data) { 
 			redditAfterTag = data.data.after;
 			// TODO: possible for after to become empty after a while ... "after": null, "before": null
 
 			console.log( "Got data! #= ", data.data.children.length )
-			addAllImages(data,listView);
+			addAllImages(data);
 	    })
 	}
 }
 
-function getReddits(subreddits, listView ) {
-	url = urlForSubreddits(subreddits, redditAfterTag);
+function getReddits(subreddits ) {
+	var url = urlForSubreddits(subreddits, redditAfterTag);
 	console.log("sending the json - after = ", redditAfterTag );
-	getRedditData(url, listView);
+	getRedditData(url);
 }
