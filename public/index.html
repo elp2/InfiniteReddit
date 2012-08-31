@@ -34,10 +34,15 @@
     <!-- NOTE: <P></P> at the beginning/end outside of div end up screwing up the spinner -->
     <script type=text/html id=image-template>
       <div class='reddit-image'>
-        <h4>{{title}}</h4>
-        <div class='reddit-image-about'>
-        By <div class='image-author'>{{ author }}</div> at <div class='image-created'>{{ created }} on <div class='image-subreddit'>{{ subreddit}}</div>
+        <h4>{{ title }}</h4>
+        <div class='reddit-image-scoretag'>        
+          <div class='reddit-image-score'>{{ score }}</div>
+          <div class='reddit-image-ups'>{{ ups }}</div>
+          <div class='reddit-image-downs'>{{ downs }}</div>
         </div>
+        <p class='reddit-image-about'>
+        By {{ author }} at {{ created }} on {{ subreddit }}
+        </p>
         <img src={{ url }} width={{ scaledWidth }} height={{ scaledHeight }}/>
       </div>
     </script>
