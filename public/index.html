@@ -55,7 +55,7 @@ $(document).ready(function(){
   var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
   imageTemplate = _.template($('#image-template').html(), false, templateSettings );
 
-  var picFetcher = new reddit.PicFetcher(listView, {onlineMode : false})
+  var picFetcher = new reddit.PicFetcher(listView, {onlineMode : window.location.toString().substring(0,4) == "http" })
   picFetcher.setSubreddits(getSubreddits());
   picFetcher.getMorePosts();
 

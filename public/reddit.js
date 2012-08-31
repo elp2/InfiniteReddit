@@ -54,8 +54,8 @@ testingJsonData = {
 
 	function urlForSubreddits(subreddits, after ) {
 		// http://www.reddit.com/r/starcraft/.json?jsonp=?&after=t3_yjbu1
-		redditsURLBase = "http://www.reddit.com/r/"
-		redditURLJsonEnding = "/.json?jsonp=?"
+		var redditsURLBase = "http://www.reddit.com/r/"
+		var redditURLJsonEnding = "/.json?jsonp=?"
 
 		var url = redditsURLBase
 		url = url + subreddits.join("+") 
@@ -63,7 +63,9 @@ testingJsonData = {
 		if( after.length > 0 )
 			url = url + "&after=" + after
 
-		console.log("Getting URL=", url)		
+		console.log("Getting URL=", url)	
+
+		return url;	
 	}
 
 	PicFetcher.prototype._getMorePosts = function() {
