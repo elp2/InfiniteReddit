@@ -29,23 +29,22 @@ function urlForSubreddits(subreddits, after ) {
 }
 
 function isImageExtension(url) {
+	var urlFile = url.split("?")[0].toLowerCase();
 	imageExtensions = [ "png", "jpeg", "jpg", "gif" ];
 	for (var i = 0; i < imageExtensions.length; i++) {
-		if(url.toLowerCase().endsWith(imageExtensions[i]))
+		if(urlFile.endsWith(imageExtensions[i]))
 			return(true);
 	};
 	return(false);	
 }
 
 function getImage(item) {
-	console.log("Parsing: ", item.url)
 	if(!shouldShowImage(item))
 		return undefined
 
 	if(!isImageExtension(item.url))
 		return undefined
 
-	console.log("showing: ", item.url)
 	return item
 }
 
@@ -90,7 +89,6 @@ function createImage( img ) {
 
 	seenURLs[img.url] = true;
 
-	console.log("adding2: ", img.url)
 	// Insert preloaded image after it finishes loading
 	$('<img />')
 	    .attr('src', img.url)
@@ -129,6 +127,5 @@ function getRedditData(url) {
 
 function getReddits(subreddits ) {
 	var url = urlForSubreddits(subreddits, redditAfterTag);
-	console.log("sending the json - after = ", redditAfterTag );
 	getRedditData(url);
 }
