@@ -2,7 +2,7 @@ String.prototype.endsWith = function(suffix) {
     return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
-testingJson = {
+testingJsonData = {
 "kind": "Listing", "data": {"modhash": "", "children": [
 {"kind": "t3", "data": {"domain": "imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "yzys5", "clicked": false, "title": "Found a strawBEARy!", "num_comments": 277, "score": 2141, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://f.thumbs.redditmedia.com/HNzAVvyLCx8ZidvG.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 6498, "saved": false, "is_self": false, "permalink": "/r/pics/comments/yzys5/found_a_strawbeary/", "name": "t3_yzys5", "created": 1346233214.0, "url": "test/1.jpeg", "author_flair_text": null, "author": "Taybow", "created_utc": 1346208014.0, "media": null, "num_reports": null, "ups": 8639}},
 {"kind": "t3", "data": {"domain": "i.imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "z0183", "clicked": false, "title": "someone yelled \"hey catwoman!\" to me on the street today.", "num_comments": 284, "score": 1521, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://a.thumbs.redditmedia.com/UjuoDj-6crcdBo70.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 1828, "saved": false, "is_self": false, "permalink": "/r/pics/comments/z0183/someone_yelled_hey_catwoman_to_me_on_the_street/", "name": "t3_z0183", "created": 1346235500.0, "url": "test/2.png", "author_flair_text": null, "author": "hotmath", "created_utc": 1346210300.0, "media": null, "num_reports": null, "ups": 3349}},
@@ -12,85 +12,127 @@ testingJson = {
 
   ], "after": "t3_yyv33", "before": null}}
 
-offlineMode = true;
+!function(window) {
+	'use strict';
 
-function urlForSubreddits(subreddits, after ) {
-	// http://www.reddit.com/r/starcraft/.json?jsonp=?&after=t3_yjbu1
-	redditsURLBase = "http://www.reddit.com/r/"
-	redditURLJsonEnding = "/.json?jsonp=?"
 
-	var url = redditsURLBase
-	url = url + subreddits.join("+") 
-	url = url + redditURLJsonEnding
-	if( after.length > 0 )
-		url = url + "&after=" + after
+	// Initial Setup
+	// =============
+	var reddit = window.reddit = {}
 
-	console.log("Getting URL=", url)		
-}
-
-function isImageExtension(url) {
-	var urlFile = url.split("?")[0].toLowerCase();
-	imageExtensions = [ "png", "jpeg", "jpg", "gif" ];
-	for (var i = 0; i < imageExtensions.length; i++) {
-		if(urlFile.endsWith(imageExtensions[i]))
-			return(true);
-	};
-	return(false);	
-}
-
-function getImage(item) {
-	if(!shouldShowImage(item))
-		return undefined
-
-	if(!isImageExtension(item.url))
-		return undefined
-
-	return item
-}
-
-redditAfterTag = ""
-
-function getSeenURLs() {
-	// TODO: actually read from local system
-
-	return {};
-}
-
-seenURLs = getSeenURLs();
-
-showOver18 = false;
-numOver18Skipped = 0;
-function skippedOver18(item) {
-	console.log("skipping over_18")
-	numOver18Skipped++;
-}
-
-function nonImageExtension(item) {
-	console.log("Unhandleable url: ", item.url)
-}
-
-function shouldShowImage(item) {
-	if(undefined == item)
-		return false
-
-	if(true == item.over_18 && !showOver18) {
-		skippedOver18(item);
-		return false;
+	// Packaging:
+	function PicFetcher(listView, options) {
+		options = options || {};
+		this.onlineMode = !!options.onlineMode;
+		this.listView = listView;
+		this.waitingForResponse = false;
+		this.lastRequestedTime = 0;
+		this.seenURLs = {};
 	}
 
-	return true
-}
+	PicFetcher.prototype.setSubreddits = function(subreddits) {
+		this.subreddits = subreddits;
+		this.afterTag = "";
+	}
 
-function createImage( img ) {
+	// Getting Posts
+	function getThrottleTime() {
+		// TODO: do this for real with currentTime() equivalent
+		return 5;
+	}
 
-	// moving into its own function seems to have resolved an issue where img would become undefined in the CB
-	if(undefined == img || undefined != seenURLs[img.url])
-		return undefined;
+	PicFetcher.prototype.getMorePosts = function () {
+		if(this.waitingForResponse) return; // already have a live request so do nothing
 
-	seenURLs[img.url] = true;
+		this.waitingForResponse = true;
+		this.lastRequestedTime = 0; // TODO: get current time
 
-	// Insert preloaded image after it finishes loading
-	$('<img />')
+		var throttleTime = getThrottleTime();
+		this._getMorePosts();
+		//setTimeout( self._getMorePosts, throttleTime ); // TODO: callback of private function with scope from setTimeout
+	}
+
+	function urlForSubreddits(subreddits, after ) {
+		// http://www.reddit.com/r/starcraft/.json?jsonp=?&after=t3_yjbu1
+		redditsURLBase = "http://www.reddit.com/r/"
+		redditURLJsonEnding = "/.json?jsonp=?"
+
+		var url = redditsURLBase
+		url = url + subreddits.join("+") 
+		url = url + redditURLJsonEnding
+		if( after.length > 0 )
+			url = url + "&after=" + after
+
+		console.log("Getting URL=", url)		
+	}
+
+	PicFetcher.prototype._getMorePosts = function() {
+		if( this.onlineMode ) {
+			var url = urlForSubreddits( this.subreddits, this.after);
+
+			$.getJSON(url, function(data) { 
+				this.afterTag = data.data.after;
+				// TODO: possible for after to become empty after a while ... "after": null, "before": null
+
+				console.log( "Got ", data.data.children.length, " posts");
+				addAllImages(data);
+				this.lastRequestedTime = 0; // TODO: time
+				this.waitingForResponse = false;
+			});
+		} else {
+			this.handlePosts(testingJsonData);
+			this.lastRequestedTime = 0; // TODO: time
+			this.waitingForResponse = false;
+		}
+	}
+
+
+	// ---- Getting Images
+	function isImageExtension(url) {
+		var urlFile = url.split("?")[0].toLowerCase();
+		var imageExtensions = [ "png", "jpeg", "jpg", "gif" ];
+		for (var i = 0; i < imageExtensions.length; i++) {
+			if(urlFile.endsWith(imageExtensions[i]))
+				return(true);
+		};
+		return(false);	
+	}
+
+	PicFetcher.prototype.shouldShowImage = function(item) {
+		if(undefined == item)
+			return false;
+
+		if(this.seenURLs[item.url]) {
+			console.log(item.url, ": already seen");
+			return false;
+		}
+
+		if(true == item.over_18) {
+			console.log(item.url, ": is over 18");
+			return false;
+		}
+
+		if(!isImageExtension(item.url)) {
+			console.log(item.url, ": is not an image")
+			return false;
+		}
+		console.log("Showing: ", item.url);
+		return true;
+	}
+
+	PicFetcher.prototype.setSeenURL = function(url) {
+		this.seenURLs[url] = true;
+		// TODO: write to local storage
+	}
+
+	PicFetcher.prototype.appendImage = function(img) {
+		if(!this.shouldShowImage(img))
+			return;
+
+		this.seenURLs[img.url] = true;
+		var listView = this.listView;
+    	// Insert preloaded image after it finishes loading
+		$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
 			var scaledWidth = this.width;
@@ -102,30 +144,31 @@ function createImage( img ) {
 
 			listView.append($(imageDiv));
 	    });
-}
-
-function addAllImages(data) {
-    $.each(data.data.children, function(i,item){
-    	var here = item.data
-    	var img = getImage( here )
-    	createImage(img)
-    });
-}
-
-function getRedditData(url) {
-	if(offlineMode) { addAllImages(testingJson) }
-	else {
-		$.getJSON(url, function(data) { 
-			redditAfterTag = data.data.after;
-			// TODO: possible for after to become empty after a while ... "after": null, "before": null
-
-			console.log( "Got data! #= ", data.data.children.length )
-			addAllImages(data);
-	    })
 	}
-}
 
-function getReddits(subreddits ) {
-	var url = urlForSubreddits(subreddits, redditAfterTag);
-	getRedditData(url);
-}
+	PicFetcher.prototype.handlePosts = function(data) {
+		this.afterTag = data.data && data.data.after;
+		if( !this.afterTag ) {
+			console.error("TODO: No after tag.  You've reached the end of reddit!  Bad things will happen!");
+		}
+
+		for (var i = data.data.children.length - 1; i >= 0; i--) {
+			var item = data.data.children[i].data;
+			this.appendImage(item);
+		};
+		/*
+		TODO: Scope in $.each
+		$.each(data.data.children, function(i,item){
+			console.log("handing", item, " i.d:", item.data, " idl: ", item.data.length );
+
+			this.appendImage(item.data)
+    	});
+*/
+	}
+
+	// Export
+	// ======
+
+	// Classes:
+	reddit.PicFetcher = PicFetcher;
+}(window);

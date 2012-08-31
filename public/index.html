@@ -50,10 +50,14 @@
 <script type=text/javascript>
 $(document).ready(function(){
   var $el = $('#demo');
-  listView = new infinity.ListView($el);
+  var listView = new infinity.ListView($el);
 
   var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
   imageTemplate = _.template($('#image-template').html(), false, templateSettings );
+
+  var picFetcher = new reddit.PicFetcher(listView, {onlineMode : false})
+  picFetcher.setSubreddits(getSubreddits());
+  picFetcher.getMorePosts();
 
   !function() {
     var spinner = $($('#spinner-template').html());
@@ -70,7 +74,7 @@ $(document).ready(function(){
       if(!updateScheduled) {
         setTimeout(function() {
           if(onscreen(spinner)) { 
-            getReddits( reddits, listView )           
+            picFetcher.getMorePosts()        
           }
           updateScheduled = false;
         }, 500);
@@ -85,13 +89,6 @@ function getSubreddits() {
     return(["all"])
   return(reddits.split("+"))
 }
-
-//TODO: remove when offline done
-setTimeout(function(){ 
-  var subReddits = getSubreddits();
-  getReddits(subReddits)
-}, 500);
-
 // end document ready
  });
 </script>
