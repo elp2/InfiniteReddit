@@ -36,7 +36,14 @@ testingJsonData = {
 	}
 
 	// Getting Posts
-	function getThrottleTime() {
+
+	PicFetcher.prototype.resetTimes = function() {
+		this.lastRequestedTime = 0; // TODO: time
+		this.waitingForResponse = false;
+	}
+
+	PicFetcher.prototype.getThrottleTime = function() {
+		this.lastRequestedTime = 0; // TODO: get current time
 		// TODO: do this for real with currentTime() equivalent
 		return 5;
 	}
@@ -45,9 +52,8 @@ testingJsonData = {
 		if(this.waitingForResponse) return; // already have a live request so do nothing
 
 		this.waitingForResponse = true;
-		this.lastRequestedTime = 0; // TODO: get current time
 
-		var throttleTime = getThrottleTime();
+		var throttleTime = this.getThrottleTime();
 		this._getMorePosts();
 		//setTimeout( self._getMorePosts, throttleTime ); // TODO: callback of private function with scope from setTimeout
 	}
@@ -68,23 +74,19 @@ testingJsonData = {
 		return url;	
 	}
 
+
 	PicFetcher.prototype._getMorePosts = function() {
+
 		if( this.onlineMode ) {
 			var url = urlForSubreddits( this.subreddits, this.after);
 
 			$.getJSON(url, function(data) { 
 				this.afterTag = data.data.after;
 				// TODO: possible for after to become empty after a while ... "after": null, "before": null
-
-				console.log( "Got ", data.data.children.length, " posts");
-				addAllImages(data);
-				this.lastRequestedTime = 0; // TODO: time
-				this.waitingForResponse = false;
+				this.handlePosts(data);
 			});
 		} else {
 			this.handlePosts(testingJsonData);
-			this.lastRequestedTime = 0; // TODO: time
-			this.waitingForResponse = false;
 		}
 	}
 
@@ -143,7 +145,6 @@ testingJsonData = {
 			img.scaledHeight = this.height * ( scaledWidth / this.width )
 
 			var imageDiv = imageTemplate(img);
-
 			listView.append($(imageDiv));
 	    });
 	}
@@ -158,6 +159,8 @@ testingJsonData = {
 		$.each(data.data.children, function(i,item){
 			self.appendImage(item.data)
     	});
+
+		this.resetTimes();
 	}
 
 	// Export
