@@ -13,6 +13,10 @@
     <script type=text/javascript src=reddit.js></script>
     <link rel=stylesheet type=text/css href=reddit.css>
 
+    <div class='main-navbar'>
+      <h1>r/all r/starcraft</h1>
+    </div>
+
     <div class='container main-container'> 
       <div id=demo class=row>
         <div class=span4>
@@ -24,17 +28,17 @@
       </div>
     </div>
     <script type=text/html id=spinner-template>
-      <div class=row>
-        <div class=span12 style="background-color:#f00"> Loading more images...
-          <img src=spinner.gif class=spinner alt='Loading...'>
-        </div>
+      <div class='spinner-template'>
+        Loading more images...
+        <img src=spinner.gif class=spinner alt='Loading...'>
       </div>
     </script>
 
     <!-- NOTE: <P></P> at the beginning/end outside of div end up screwing up the spinner -->
+    <!-- TODO: Author flair/links -->
     <script type=text/html id=image-template>
       <div class='reddit-image'>
-        <h4>{{ title }}</h4>
+        <h3>{{ title }}</h3>         
         <div class='reddit-image-scoretag'>        
           <div class='reddit-image-score'>{{ score }}</div>
           <div class='reddit-image-ups'>{{ ups }}</div>
@@ -55,7 +59,7 @@ $(document).ready(function(){
   var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
   imageTemplate = _.template($('#image-template').html(), false, templateSettings );
 
-  var picFetcher = new reddit.PicFetcher(listView, {onlineMode : window.location.toString().substring(0,4) == "http" })
+  var picFetcher = new reddit.PicFetcher(listView, { onlineMode : window.location.toString().substring(0,4) == "http" })
   picFetcher.setSubreddits(getSubreddits());
   picFetcher.getMorePosts();
 
