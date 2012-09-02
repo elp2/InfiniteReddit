@@ -154,18 +154,10 @@ testingJsonData = {
 			console.error("TODO: No after tag.  You've reached the end of reddit!  Bad things will happen!");
 		}
 
-		for (var i = data.data.children.length - 1; i >= 0; i--) {
-			var item = data.data.children[i].data;
-			this.appendImage(item);
-		};
-		/*
-		TODO: Scope in $.each
+		var self = this;
 		$.each(data.data.children, function(i,item){
-			console.log("handing", item, " i.d:", item.data, " idl: ", item.data.length );
-
-			this.appendImage(item.data)
+			self.appendImage(item.data)
     	});
-*/
 	}
 
 	// Export
