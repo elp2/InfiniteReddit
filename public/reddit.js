@@ -163,6 +163,18 @@ testingJsonData = {
 		this.resetTimes();
 	}
 
+	PicFetcher.prototype.advance = function(delta) {
+		var couldAdvance = this.listView.advance(delta);
+		if(!couldAdvance) {
+			//TODO: show getting more iterstatial, make the next one auto scrolled to
+			this.getMorePosts();
+		}
+	}
+	// Debug
+	PicFetcher.prototype.debug = function() {
+		this.listView.debug();
+	}
+
 	// Export
 	// ======
 

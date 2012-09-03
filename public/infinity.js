@@ -157,6 +157,45 @@
     return item;
   };
 
+  function findVisibleItems( listView ) {
+    // Assumes that pages  + items will always be arranged in order, and that the listitem is not at the 0 px height on the page
+    var flatItems = [];
+    for (var i = 0; i < listView.pages.length; i++) {
+      var page = listView.pages[i];
+      for (var j = 0; j < page.items.length; j++) {
+        var item = page.items[j];
+        flatItems[flatItems.length] = item;
+      };
+    };
+
+    var viewportTop = $(window).scrollTop();
+    for (var i=flatItems.length-1; i>=0;i--) {
+        item = flatItems[i];
+        var itemTop = Math.floor(item.$el.offset().top);
+        if(0!=itemTop && itemTop<=viewportTop) { // 0 means probably offscreen item... double check
+          return( { '0': item, '1': flatItems[i+1], '-1': flatItems[i-1]})
+        }
+    }
+    return {'0':flatItems[0], '1':flatItems[1]}
+  }
+  ListView.prototype.debug = function() {
+  }
+
+  // Returns true if we advanced
+  ListView.prototype.advance = function(delta) {
+    //TODO: assert(1===delta || -1 ===delta);
+    var visible = findVisibleItems(this);
+    var dts = delta.toString();
+    var next = visible[delta.toString()];
+    if(next) {
+      var st = next.$el.offset().top;
+      window.scrollTo( 0, st);
+      return(true);
+    } else {
+      return(false);
+    }
+
+  }
 
   // ### cacheCoordsFor
   //

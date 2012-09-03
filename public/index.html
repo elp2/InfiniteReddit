@@ -59,7 +59,7 @@ $(document).ready(function(){
   var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
   imageTemplate = _.template($('#image-template').html(), false, templateSettings );
 
-  var picFetcher = new reddit.PicFetcher(listView, { onlineMode : window.location.toString().substring(0,4) == "http" })
+  picFetcher = new reddit.PicFetcher(listView, { onlineMode : window.location.toString().substring(0,4) == "http" })
   picFetcher.setSubreddits(getSubreddits());
   picFetcher.getMorePosts();
 
@@ -95,6 +95,30 @@ function getSubreddits() {
 }
 // end document ready
  });
+
+
+$(document).keydown(function(event) {
+  var jCode = 74, kCode = 75, aCode = 65, sCode = 83, dCode = 68;
+  switch(event.which) {
+    case jCode:
+    case aCode:
+      picFetcher.advance(-1);
+      break;
+
+    case kCode:
+    case sCode:
+      picFetcher.advance(1);
+      break;
+
+    case dCode:
+      picFetcher.debug();
+      break;
+
+    break;
+  }
+//console.log(event);
+});
+
 </script>
 </body>
 </html>
