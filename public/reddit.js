@@ -78,15 +78,16 @@ testingJsonData = {
 	PicFetcher.prototype._getMorePosts = function() {
 
 		if( this.onlineMode ) {
-			var url = urlForSubreddits( this.subreddits, this.after);
-
+			var url = urlForSubreddits( this.subreddits, this.afterTag);
+			var self = this;
 			$.getJSON(url, function(data) { 
 				this.afterTag = data.data.after;
 				// TODO: possible for after to become empty after a while ... "after": null, "before": null
-				this.handlePosts(data);
+				self.handlePosts(data);
 			});
 		} else {
 			this.handlePosts(testingJsonData);
+			this.afterTag = "";
 		}
 	}
 
