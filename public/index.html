@@ -102,12 +102,12 @@ $(document).keydown(function(event) {
   switch(event.which) {
     case jCode:
     case aCode:
-      picFetcher.advance(-1);
+      picFetcher.advance(1);
       break;
 
     case kCode:
     case sCode:
-      picFetcher.advance(1);
+      picFetcher.advance(-1);
       break;
 
     case dCode:
