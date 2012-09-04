@@ -27,7 +27,13 @@ testingJsonData = {
 		this.listView = listView;
 		this.waitingForResponse = false;
 		this.lastRequestedTime = 0;
-		this.seenURLs = {};
+
+		if(this.onlineMode) {
+			this.seenURLs = getSeenURLs();
+		} else {
+			localStorage.clear();
+			this.seenURLs = {};
+		}
 	}
 
 	PicFetcher.prototype.setSubreddits = function(subreddits) {
@@ -125,9 +131,26 @@ testingJsonData = {
 		return true;
 	}
 
+	function getSeenURLs() {
+		var seenURLs = {};
+
+		for(var url in localStorage) {
+			var accessedAt = localStorage[url];
+			try {
+				seenURLs[url] = JSON.parse(accessedAt);
+			} catch (e) {
+				console.error("Error deserializing key=", url, "val=", accessedAt, ".\n", e);
+				// Had a random cb_cp URL which didn't parse
+			}
+		}
+
+		return(seenURLs);
+	}
+
 	PicFetcher.prototype.setSeenURL = function(url) {
 		this.seenURLs[url] = true;
-		// TODO: write to local storage
+		var accessedAt = {"@": (new Date).getTime()};
+		localStorage[url] = JSON.stringify(accessedAt);
 	}
 
 	PicFetcher.prototype.appendImage = function(img) {
@@ -136,7 +159,8 @@ testingJsonData = {
 
 		this.seenURLs[img.url] = true;
 		var listView = this.listView;
-    	// Insert preloaded image after it finishes loading
+		var self = this;
+    	// Insert preloaded image after it finishes loading via "load" callback
 		$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
@@ -147,6 +171,7 @@ testingJsonData = {
 
 			var imageDiv = imageTemplate(img);
 			listView.append($(imageDiv));
+			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
 	    });
 	}
 
