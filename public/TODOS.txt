@@ -1,6 +1,6 @@
-* Local storage for the seen photos list
+[X] Local storage for the seen photos list
 
-* keep track of height of each image
-	* j/k/a/z navigation to move up and down
-	* detect when scrolling is happening and need to refresh
+[ ] keep track of height of each image
+	[X] j/k/a/z navigation to move up and down
+	[ ] detect when scrolling is happening and need to refresh
 
