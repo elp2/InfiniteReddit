@@ -10,7 +10,9 @@ testingJsonData = {
 {"kind": "t3", "data": {"domain": "imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "z01rw", "clicked": false, "title": "Cat after being saved from a burning building.", "num_comments": 87, "score": 1013, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://a.thumbs.redditmedia.com/q6HfTCDPJT6zG680.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 342, "saved": false, "is_self": false, "permalink": "/r/pics/comments/z01rw/cat_after_being_saved_from_a_burning_building/", "name": "t3_z01rw", "created": 1346235971.0, "url": "test/4.jpg", "author_flair_text": null, "author": "k80k80k80", "created_utc": 1346210771.0, "media": null, "num_reports": null, "ups": 1355}}, 
 {"kind": "t3", "data": {"domain": "i.imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "yzkgy", "clicked": false, "title": "Grew up on a reservation, quite poor. Told myself I would see the world. The first place I went.", "num_comments": 372, "score": 1827, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://d.thumbs.redditmedia.com/KGR-lIf-fxSJevf9.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 4986, "saved": false, "is_self": false, "permalink": "/r/pics/comments/yzkgy/grew_up_on_a_reservation_quite_poor_told_myself_i/", "name": "t3_yzkgy", "created": 1346219594.0, "url": "test/5.jpg", "author_flair_text": null, "author": "blindfishy", "created_utc": 1346194394.0, "media": null, "num_reports": null, "ups": 6813}}
 
-  ], "after": "t3_yyv33", "before": null}}
+  ], "after": "t3_yyv33", "before": null}};
+
+REDDIT_THROTTLE_MS = 2000;
 
 !function(window) {
 	'use strict';
@@ -25,8 +27,9 @@ testingJsonData = {
 		options = options || {};
 		this.onlineMode = !!options.onlineMode;
 		this.listView = listView;
+
+		this.canRequestAt = (new Date()).getTime(); 
 		this.waitingForResponse = false;
-		this.lastRequestedTime = 0;
 
 		if(this.onlineMode) {
 			this.seenURLs = getSeenURLs();
@@ -44,24 +47,25 @@ testingJsonData = {
 	// Getting Posts
 
 	PicFetcher.prototype.resetTimes = function() {
-		this.lastRequestedTime = 0; // TODO: time
+		this.canRequestAt = (new Date()).getTime() + REDDIT_THROTTLE_MS; 
 		this.waitingForResponse = false;
 	}
 
 	PicFetcher.prototype.getThrottleTime = function() {
-		this.lastRequestedTime = 0; // TODO: get current time
-		// TODO: do this for real with currentTime() equivalent
-		return 5;
+		var now = (new Date()).getTime();
+		var throttleTime = this.canRequestAt < now ? 0 : this.canRequestAt - now;
+		return (throttleTime);
 	}
 
 	PicFetcher.prototype.getMorePosts = function () {
-		if(this.waitingForResponse) return; // already have a live request so do nothing
-
+		if(this.waitingForResponse) {
+			return; // already have a live request so do nothing
+		}
 		this.waitingForResponse = true;
 
 		var throttleTime = this.getThrottleTime();
-		this._getMorePosts();
-		//setTimeout( self._getMorePosts, throttleTime ); // TODO: callback of private function with scope from setTimeout
+		var self = this;
+		setTimeout( function(){self._getMorePosts()}, throttleTime ); // TODO: callback of private function with scope from setTimeout
 	}
 
 	function urlForSubreddits(subreddits, after ) {
@@ -136,11 +140,13 @@ testingJsonData = {
 
 		for(var url in localStorage) {
 			var accessedAt = localStorage[url];
+			if(!accessedAt.charAt(0) == "{")
+				continue; // Had a random cb_cp key which I didn't set and isn't a valid JSON key
 			try {
+				console.log("???", accessedAt);
 				seenURLs[url] = JSON.parse(accessedAt);
 			} catch (e) {
 				console.error("Error deserializing key=", url, "val=", accessedAt, ".\n", e);
-				// Had a random cb_cp URL which didn't parse
 			}
 		}
 
@@ -151,6 +157,7 @@ testingJsonData = {
 		this.seenURLs[url] = true;
 		var accessedAt = {"@": (new Date).getTime()};
 		localStorage[url] = JSON.stringify(accessedAt);
+		// TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
 	}
 
 	PicFetcher.prototype.appendImage = function(img) {
