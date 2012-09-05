@@ -4,3 +4,6 @@
 	[X] j/k/a/z navigation to move up and down
 	[ ] detect when scrolling is happening and need to refresh
 
+[ ] Proxy console.X commands for browsers without console
+
+ 
