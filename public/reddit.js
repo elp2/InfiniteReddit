@@ -30,6 +30,7 @@ REDDIT_THROTTLE_MS = 2000;
 
 		this.canRequestAt = (new Date()).getTime(); 
 		this.waitingForResponse = false;
+		this.autoScrollToNext = true;
 
 		if(this.onlineMode) {
 			this.seenURLs = getSeenURLs();
@@ -65,7 +66,7 @@ REDDIT_THROTTLE_MS = 2000;
 
 		var throttleTime = this.getThrottleTime();
 		var self = this;
-		setTimeout( function(){self._getMorePosts()}, throttleTime ); // TODO: callback of private function with scope from setTimeout
+		setTimeout( function(){self._getMorePosts()}, throttleTime ); 
 	}
 
 	function urlForSubreddits(subreddits, after ) {
@@ -91,8 +92,6 @@ REDDIT_THROTTLE_MS = 2000;
 			var url = urlForSubreddits( this.subreddits, this.afterTag);
 			var self = this;
 			$.getJSON(url, function(data) { 
-				this.afterTag = data.data.after;
-				// TODO: possible for after to become empty after a while ... "after": null, "before": null
 				self.handlePosts(data);
 			});
 		} else {
@@ -143,7 +142,6 @@ REDDIT_THROTTLE_MS = 2000;
 			if(!accessedAt.charAt(0) == "{")
 				continue; // Had a random cb_cp key which I didn't set and isn't a valid JSON key
 			try {
-				console.log("???", accessedAt);
 				seenURLs[url] = JSON.parse(accessedAt);
 			} catch (e) {
 				console.error("Error deserializing key=", url, "val=", accessedAt, ".\n", e);
@@ -177,8 +175,12 @@ REDDIT_THROTTLE_MS = 2000;
 			img.scaledHeight = this.height * ( img.scaledWidth / this.width );
 
 			var imageDiv = imageTemplate(img);
-			listView.append($(imageDiv));
+			var listItem = listView.append($(imageDiv));
 			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
+			if(self.autoScrollToNext) {
+				self.autoScrollToNext = false;				
+			    window.scrollTo( 0, listItem.$el.offset().top);
+			}
 	    });
 	}
 
@@ -200,6 +202,7 @@ REDDIT_THROTTLE_MS = 2000;
 		var couldAdvance = this.listView.advance(delta);
 		if(!couldAdvance) {
 			//TODO: show getting more iterstatial, make the next one auto scrolled to
+			this.autoScrollToNext = true;
 			this.getMorePosts();
 		}
 	}
