@@ -183,13 +183,11 @@
 
   // Returns true if we advanced
   ListView.prototype.advance = function(delta) {
-    //TODO: assert(1===delta || -1 ===delta);
+    if(1 != delta && -1 != delta ) throw( "delta must be -1 or 1");
     var visible = findVisibleItems(this);
-    var dts = delta.toString();
     var next = visible[delta.toString()];
     if(next) {
-      var st = next.$el.offset().top;
-      window.scrollTo( 0, st);
+      window.scrollTo( 0, next.$el.offset().top);
       return(true);
     } else {
       return(false);
