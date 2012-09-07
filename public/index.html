@@ -5,6 +5,8 @@
     <meta charset=utf-8>
     <title>Infinite Reddit</title>
     <link rel=stylesheet type=text/css href=reddit.css>
+    <link rel=stylesheet type=text/css href=css/bootstrap.css>
+    <link rel=stylesheet type=text/css href=css/font-awesome.css><!-- Font Awesome - http://fortawesome.github.com/Font-Awesome -->
   </head>
   <body>
     <script type=text/javascript src=underscore.js></script>
@@ -13,12 +15,31 @@
     <script type=text/javascript src=infinity.js></script>
     <script type=text/javascript src=reddit.js></script>
 
-    <div class='main-navbar'>
-      <h1>r/all r/starcraft</h1>
-    </div>
 
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="./index.html">∞.r</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="">r/all - r/starcraft - r/whatever</a>
+              </li>
+            </ul>
+          </div>
+        <ul class="nav pull-right">
+          <li>
+            <a href="settings"><i class="icon-cogs"></i>Settings</a>
+          </li>
+          <li>
+            <a href="settings"><i class="icon-info-sign"></i>About</a>
+          </li>
+        </ul>
+        </div>
+      </div>
+    </div>
     <div class='container main-container'> 
-      <div id=demo class=row>
+      <div id=images class=row>
         <div class=span4>
           <div class=row-fluid>
             <div class='list-view'>
@@ -53,7 +74,7 @@
 
 <script type=text/javascript>
 $(document).ready(function(){
-  var $el = $('#demo');
+  var $el = $('#images');
   var listView = new infinity.ListView($el);
 
   var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
@@ -67,7 +88,7 @@ $(document).ready(function(){
     var spinner = $($('#spinner-template').html());
     var updateScheduled = false;
 
-    spinner.insertAfter($('#demo').closest('.row'));
+    spinner.insertAfter($('#images').closest('.row'));
 
     function onscreen($el) {
       var viewportBottom = $(window).scrollTop() + $(window).height();
@@ -78,7 +99,7 @@ $(document).ready(function(){
       if(!updateScheduled) {
         setTimeout(function() {
           if(onscreen(spinner)) { 
-            picFetcher.getMorePosts()        
+            picFetcher.getMorePosts(true);       
           }
           updateScheduled = false;
         }, 500);

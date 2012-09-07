@@ -58,11 +58,14 @@ REDDIT_THROTTLE_MS = 2000;
 		return (throttleTime);
 	}
 
-	PicFetcher.prototype.getMorePosts = function () {
+	PicFetcher.prototype.getMorePosts = function (autoScrollToNext) {
 		if(this.waitingForResponse) {
 			return; // already have a live request so do nothing
 		}
 		this.waitingForResponse = true;
+		if(autoScrollToNext) {
+			this.autoScrollToNext = true;
+		}
 
 		var throttleTime = this.getThrottleTime();
 		var self = this;
@@ -201,9 +204,7 @@ REDDIT_THROTTLE_MS = 2000;
 	PicFetcher.prototype.advance = function(delta) {
 		var couldAdvance = this.listView.advance(delta);
 		if(!couldAdvance) {
-			//TODO: show getting more iterstatial, make the next one auto scrolled to
-			this.autoScrollToNext = true;
-			this.getMorePosts();
+			this.getMorePosts(true);
 		}
 	}
 	// Debug

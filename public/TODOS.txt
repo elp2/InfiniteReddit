@@ -1,9 +1,9 @@
-[X] Local storage for the seen photos list
+detect when scrolling is happening and need to refresh before reaching bottom
 
-[ ] keep track of height of each image
-	[X] j/k/a/z navigation to move up and down
-	[ ] detect when scrolling is happening and need to refresh before reaching bottom
+Proxy console.X commands for browsers without console
 
-[ ] Proxy console.X commands for browsers without console
-
+Issue where j is not advancing us properly to the top so it ends up needing two j's to advance.  1 to get us to the top properly, one to advance to next.
  
+Top Navigation bar showing current reddits/other stats
+
+What's the usage of the data- tags in HTML?
