@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
-	<title>SwipeView</title>
+	<title>∞.r</title>
 	<link href="style.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="swipeview.js"></script>
 	<script type="text/javascript" src="jquery-1.8.0.js"></script>
@@ -16,7 +16,6 @@
 	<div id="wrapper"></div>
 	
 <script type="text/javascript">
-
 
 document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 
@@ -42,7 +41,7 @@ var	gallery,
 			width: 300,
 			height: 164,
 			desc: 'Tuscan Landscape'
-		},
+		},/*
 		{
 			url: 'images/pic03.jpg',
 			width: 300,
@@ -60,7 +59,7 @@ var	gallery,
 			width: 300,
 			height: 213,
 			desc: 'Medieval guard tower, Asciano, Siena, Italy'
-		},
+		},*/
 	];
 
 gallery = new SwipeView('#wrapper', { numberOfPages: slides.length, loop: false});
@@ -80,7 +79,7 @@ for (i=0; i<3; i++) {
 	el.innerHTML = "Loading: " + i + "";
 	gallery.masterPages[i].appendChild(el);
 }
-
+/*
 setTimeout( function() {  			
 i=1;
 			el = gallery.masterPages[i].querySelector('img');
@@ -93,8 +92,7 @@ i=1;
 	console.log("EL: ", el, " ih", el.innerHTML);
 			el.innerHTML = "TEST!";
 }, 1000 );
-
-gallery.onNew
+*/
 
 gallery.onFlip(function () {
 	var el,
@@ -135,11 +133,15 @@ $(document).keydown(function(event) {
   switch(event.which) {
     case jCode:
     case aCode:
-      gallery.next()
+      picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
+
+      gallery.next();
       break;
 
     case kCode:
     case sCode:
+//      picFetcher.getMorePosts();
+
       gallery.prev();
       break;
 
@@ -150,15 +152,19 @@ $(document).keydown(function(event) {
   }
 });
 
-
-
-
 $(document).ready(function(){
+	function addImage( img, w, h, advanceToNext ) {
+		var el, 
+			newPageI = gallery.options.numberOfPages;
 
-//  var templateSettings = { interpolate : /\{\{(.+?)\}\}/g };
-//  imageTemplate = _.template($('#image-template').html(), false, templateSettings );
+		console.log("Adding: ", img.url, "@", newPageI, w, "x", h);
 
-  picFetcher = new reddit.PicFetcher(gallery, { onlineMode : window.location.toString().substring(0,4) == "http" })
+		gallery.updatePageCount(newPageI + 1);
+		slides.push({url:img.url, width:w, height:h, desc:img.title});
+	};
+
+  var onlineMode = true; //  window.location.toString().substring(0,4) == "http";
+  picFetcher = new reddit.PicFetcher(gallery, { onlineMode: onlineMode, imgFn: addImage  })
   picFetcher.setSubreddits(getSubreddits());
   picFetcher.getMorePosts();
 
