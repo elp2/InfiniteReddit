@@ -72,7 +72,7 @@ var SwipeView = (function (window, document) {
 			// User defined options
 			for (i in options) this.options[i] = options[i];
 			
-			this.wrapper.style.overflow = 'hidden';
+			//this.wrapper.style.overflow = 'hidden'; // allow vertical scrolling of large items
 			this.wrapper.style.position = 'relative';
 			
 			this.masterPages = [];
@@ -331,7 +331,9 @@ var SwipeView = (function (window, document) {
 			}
 
 			// We are scrolling vertically, so skip SwipeView and give the control back to the browser
+			console.log("tdl: ", this.directionLocked,  this.stepsY > this.stepsX )
 			if (!this.directionLocked && this.stepsY > this.stepsX) {
+				console.log("returning to browser");
 				this.initiated = false;
 				return;
 			}
