@@ -48,6 +48,7 @@ REDDIT_THROTTLE_MS = 2000;
 	function PicFetcher(listView, options) {
 		options = options || {};
 		this.onlineMode = !!options.onlineMode;
+		this.imgFn = options.imgFn; // TODO: get properly
 		this.listView = listView;
 
 		this.canRequestAt = (new Date()).getTime(); 
@@ -214,11 +215,15 @@ REDDIT_THROTTLE_MS = 2000;
 			var maxWidth = $(window).width() - 30;
 
 			var scaledWidth = Math.min(maxWidth, this.width);
-			var scaledHeight = this.height * ( img.scaledWidth / this.width );
+			var scaledHeight = this.height * ( scaledWidth / this.width );
 
 			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
-
-			listView.appendImage(img, scaledWidth, scaledHeight, self.autoScrollToNext);
+			if( self.imgFn) {
+				self.imgFn(img, scaledWidth, scaledHeight, self.autoScrollToNext);
+			} else {
+				// TODO: standardize calls
+			//	listView.appendImage(img, scaledWidth, scaledHeight, self.autoScrollToNext);
+			}
 			self.autoScrollToNext = false;
 	    });
 	}

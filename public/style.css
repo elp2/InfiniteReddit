@@ -94,7 +94,7 @@ body {
 
 #swipeview-slider span {
 	position:absolute;
-	bottom:0;
+	top:0;
 	left:0;
 	width:100%;
 	padding:20px 0;

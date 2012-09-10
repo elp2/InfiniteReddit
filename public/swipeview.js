@@ -71,8 +71,9 @@ var SwipeView = (function (window, document) {
 		
 			// User defined options
 			for (i in options) this.options[i] = options[i];
-			
-			//this.wrapper.style.overflow = 'hidden'; // allow vertical scrolling of large items
+
+			// TODO: With this, we can't scroll down.  Without it we start getting scrollbars and it screws up the available div size			
+			this.wrapper.style.overflow = 'hidden'; 
 			this.wrapper.style.position = 'relative';
 			
 			this.masterPages = [];
@@ -171,28 +172,6 @@ var SwipeView = (function (window, document) {
 				/%/.test(this.options.snapThreshold) ?
 					Math.round(this.pageWidth * this.options.snapThreshold.replace('%', '') / 100) :
 					this.options.snapThreshold;
-		},
-		
-		appendImage: function( img, w, h, advanceToNext ) {
-			var el, 
-				newPageI = this.options.numberOfPages;
-
-			console.log("Adding: ", img.url, "@", newPageI, w, "x", h);
-
-			this.updatePageCount(newPageI + 1);
-
-
-			el = document.createElement('img');
-			el.className = 'loading';
-			el.src = "";
-			el.width = w;
-			el.height = h;
-			el.onload = function () { this.className = ''; }
-			this.masterPages[newPageI].appendChild(el);
-
-			el = document.createElement('span');
-			el.innerHTML = "Loading: " + nePageI + "";
-			this.masterPages[newPageI].appendChild(el);
 		},
 
 		updatePageCount: function (n) {
