@@ -2,6 +2,28 @@ String.prototype.endsWith = function(suffix) {
     return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
+/* jQuery Tiny Pub/Sub - v0.7 - 10/27/2011
+ * http://benalman.com/
+ * Copyright (c) 2011 "Cowboy" Ben Alman; Licensed MIT, GPL */
+
+(function($) {
+
+  var o = $({});
+
+  $.subscribe = function() {
+    o.on.apply(o, arguments);
+  };
+
+  $.unsubscribe = function() {
+    o.off.apply(o, arguments);
+  };
+
+  $.publish = function() {
+    o.trigger.apply(o, arguments);
+  };
+
+}(jQuery));
+
 testingJsonData = {
 "kind": "Listing", "data": {"modhash": "", "children": [
 {"kind": "t3", "data": {"domain": "imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "yzys5", "clicked": false, "title": "Found a strawBEARy!", "num_comments": 277, "score": 2141, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://f.thumbs.redditmedia.com/HNzAVvyLCx8ZidvG.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 6498, "saved": false, "is_self": false, "permalink": "/r/pics/comments/yzys5/found_a_strawbeary/", "name": "t3_yzys5", "created": 1346233214.0, "url": "test/1.jpeg", "author_flair_text": null, "author": "Taybow", "created_utc": 1346208014.0, "media": null, "num_reports": null, "ups": 8639}},
@@ -161,6 +183,22 @@ REDDIT_THROTTLE_MS = 2000;
 		// TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
 	}
 
+	/* should be in the ListView 
+
+				var scaledWidth = this.width;
+			var maxWidth = $(window).width() - 30
+			img.scaledWidth = Math.min(maxWidth, this.width);
+			img.scaledHeight = this.height * ( img.scaledWidth / this.width );
+
+			var imageDiv = imageTemplate(img);
+			var listItem = listView.append($(imageDiv));
+			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
+			if(self.autoScrollToNext) {
+				self.autoScrollToNext = false;				
+			    window.scrollTo( 0, listItem.$el.offset().top);
+			}
+			*/
+
 	PicFetcher.prototype.appendImage = function(img) {
 		if(!this.shouldShowImage(img))
 			return;
@@ -173,17 +211,15 @@ REDDIT_THROTTLE_MS = 2000;
 	    .attr('src', img.url)
 	    .load(function(){
 			var scaledWidth = this.width;
-			var maxWidth = $(window).width() - 30
-			img.scaledWidth = Math.min(maxWidth, this.width);
-			img.scaledHeight = this.height * ( img.scaledWidth / this.width );
+			var maxWidth = $(window).width() - 30;
 
-			var imageDiv = imageTemplate(img);
-			var listItem = listView.append($(imageDiv));
+			var scaledWidth = Math.min(maxWidth, this.width);
+			var scaledHeight = this.height * ( img.scaledWidth / this.width );
+
 			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
-			if(self.autoScrollToNext) {
-				self.autoScrollToNext = false;				
-			    window.scrollTo( 0, listItem.$el.offset().top);
-			}
+
+			listView.appendImage(img, scaledWidth, scaledHeight, self.autoScrollToNext);
+			self.autoScrollToNext = false;
 	    });
 	}
 

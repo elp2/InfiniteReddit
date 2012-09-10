@@ -1,0 +1,30 @@
+<html>
+
+	<script type="text/javascript" src="../jquery-1.8.0.js"></script>
+
+<script>
+
+
+(function($) {
+
+  var o = $({});
+
+  $.subscribe = function() {
+    o.on.apply(o, arguments);
+  };
+
+  $.unsubscribe = function() {
+    o.off.apply(o, arguments);
+  };
+
+  $.publish = function() {
+    o.trigger.apply(o, arguments);
+  };
+
+}(jQuery));
+
+
+$(window).bind("test", function(a){console.log(a, "!");});
+
+$(window).trigger("test", "ELP");
+</script></html>
