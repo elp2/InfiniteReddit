@@ -24,42 +24,6 @@ var	gallery,
 	i,
 	page,
 	slides = [
-		{
-			url: 'images/pic06.jpg',
-			width: 300,
-			height: 1500,
-			desc: 'Leaning tower, Pisa, Italy'
-		},	
-		{
-			url: 'images/pic01.jpg',
-			width: 300,
-			height: 213,
-			desc: 'Piazza del Duomo, Florence, Italy'
-		},
-		{
-			url: 'images/pic02.jpg',
-			width: 300,
-			height: 164,
-			desc: 'Tuscan Landscape'
-		},/*
-		{
-			url: 'images/pic03.jpg',
-			width: 300,
-			height: 213,
-			desc: 'Colosseo, Rome, Italy'
-		},
-		{
-			url: 'images/pic04.jpg',
-			width: 147,
-			height: 220,
-			desc: 'Somewhere near Chinatown, San Francisco'
-		},
-		{
-			url: 'images/pic05.jpg',
-			width: 300,
-			height: 213,
-			desc: 'Medieval guard tower, Asciano, Siena, Italy'
-		},*/
 	];
 
 gallery = new SwipeView('#wrapper', { numberOfPages: slides.length, loop: false});
@@ -67,6 +31,7 @@ gallery = new SwipeView('#wrapper', { numberOfPages: slides.length, loop: false}
 // Load initial data
 for (i=0; i<3; i++) {
 	page = i==0 ? slides.length-1 : i-1;
+	// TODO: switch to templating
 	el = document.createElement('img');
 	el.className = 'loading';
 	el.src = "";
@@ -79,20 +44,20 @@ for (i=0; i<3; i++) {
 	el.innerHTML = "Loading: " + i + "";
 	gallery.masterPages[i].appendChild(el);
 }
-/*
-setTimeout( function() {  			
-i=1;
-			el = gallery.masterPages[i].querySelector('img');
-			el.className = 'loading';
-			el.src = "images/pic06.jpg"
-			el.width = 300;
-			el.height = 1500;
 
+function putSlideAt(upcoming, i) {
+	console.log("upcoming = ", upcoming, "so switch", i)
+
+	var slide = slides[upcoming] ? slides[upcoming] : {url:"", width:250, height:250, desc: ""};
+	el = gallery.masterPages[i].querySelector('img');
+	el.className = 'loading';
+	el.src = slide.url;
+	el.width = slide.width;
+	el.height = slide.height;
+	
 	el = gallery.masterPages[i].querySelector('span');
-	console.log("EL: ", el, " ih", el.innerHTML);
-			el.innerHTML = "TEST!";
-}, 1000 );
-*/
+	el.innerHTML = slide.desc;
+}
 
 gallery.onFlip(function () {
 	var el,
@@ -103,18 +68,9 @@ gallery.onFlip(function () {
 		upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
 
 		if (upcoming != gallery.masterPages[i].dataset.pageIndex) {
-			el = gallery.masterPages[i].querySelector('img');
-			el.className = 'loading';
-			el.src = slides[upcoming].url;
-			el.width = slides[upcoming].width;
-			el.height = slides[upcoming].height;
-			
-			el = gallery.masterPages[i].querySelector('span');
-			el.innerHTML = slides[upcoming].desc;
+			putSlideAt(upcoming,i);
 		}
 	}
-	
-	//document.querySelector('#nav .selected').className = '';
 });
 
 gallery.onMoveOut(function () {
@@ -129,44 +85,60 @@ gallery.onMoveIn(function () {
 });
 
 $(document).keydown(function(event) {
-  var jCode = 74, kCode = 75, aCode = 65, sCode = 83, dCode = 68;
+  var jCode = 74, kCode = 75, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
   switch(event.which) {
     case jCode:
     case aCode:
       picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
-
-      gallery.next();
+      if( !gallery.next() ) {
+      	// TODO: Show some kind of loading screen... maybe let it advance 1 and then replace it as the image comes in
+      	console.log("!!!!!!!!!!!No more to advance... loading");
+      }
       break;
 
     case kCode:
     case sCode:
-//      picFetcher.getMorePosts();
-
       gallery.prev();
       break;
 
     case dCode:
+    // Debugging
       break;
 
+      case spaceCode:
+      	// TODO: advance down the image if it's super tall, advance to next if we're at the bottom / it was already visible
+      break;
     break;
   }
 });
 
+var firstImages = 0;
 $(document).ready(function(){
 	function addImage( img, w, h, advanceToNext ) {
 		var el, 
 			newPageI = gallery.options.numberOfPages;
 
+		// TODO: add to the first pages if they haven't had anything added yet
 		console.log("Adding: ", img.url, "@", newPageI, w, "x", h);
 
 		gallery.updatePageCount(newPageI + 1);
-		slides.push({url:img.url, width:w, height:h, desc:img.title});
+		slides.push({url:img.url, width:w, height:h, desc:img.title});		
+
+		if(1 == firstImages) {
+			putSlideAt(1,2);
+			firstImages++;
+		} else if(0==firstImages){
+			putSlideAt(0,1);
+			firstImages++;
+		}
 	};
 
-  var onlineMode = true; //  window.location.toString().substring(0,4) == "http";
+  var onlineMode = true; //window.location.toString().substring(0,4) == "http";
   picFetcher = new reddit.PicFetcher(gallery, { onlineMode: onlineMode, imgFn: addImage  })
   picFetcher.setSubreddits(getSubreddits());
-  picFetcher.getMorePosts();
+
+  function getit() { picFetcher.getMorePosts()};
+  setTimeout( getit, 100 );
 
 function getSubreddits() {  
   var reddits = window.location.toString().split("?")[1];

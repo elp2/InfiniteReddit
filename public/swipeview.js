@@ -228,19 +228,21 @@ var SwipeView = (function (window, document) {
 		},
 		
 		next: function () {
-			if (!this.options.loop && this.x == this.maxX) return;
+			if (!this.options.loop && this.x == this.maxX) return false;
 			
 			this.directionX = -1;
 			this.x -= 1;
 			this.__checkPosition();
+			return true;
 		},
 
 		prev: function () {
-			if (!this.options.loop && this.x === 0) return;
+			if (!this.options.loop && this.x === 0) return false;
 
 			this.directionX = 1;
 			this.x += 1;
 			this.__checkPosition();
+			return true;
 		},
 
 		handleEvent: function (e) {
