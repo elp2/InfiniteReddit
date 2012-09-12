@@ -52,6 +52,9 @@ function putSlideAt(upcoming, i) {
 	el.src = slide.url;
 	el.width = slide.width;
 	el.height = slide.height;
+	var img = $(el);
+	img.data('orig-width', slide.width);
+	img.data('orig-height', slide.height);
 	
 	el = gallery.masterPages[i].querySelector('span');
 	el.innerHTML = slide.desc;
@@ -83,7 +86,7 @@ gallery.onMoveIn(function () {
 });
 
 $(document).keydown(function(event) {
-  var jCode = 74, kCode = 75, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
+  var jCode = 74, kCode = 75, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32, zCode=90;
   switch(event.which) {
     case jCode:
     case aCode:
@@ -102,9 +105,23 @@ $(document).keydown(function(event) {
     // Debugging
       break;
 
-      case spaceCode:
-      	// TODO: advance down the image if it's super tall, advance to next if we're at the bottom / it was already visible
+    case spaceCode:
+    // TODO: advance down the image if it's super tall, advance to next if we're at the bottom / it was already visible
       break;
+
+    case zCode:
+      var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // TODO: replace w jquery selector
+      var zoomed = img.width() != img.data('orig-width'); 
+      if(zoomed) { 
+      	img.width(img.data('orig-width'));
+      	img.height(img.data('orig-height'));
+      } else {
+      	var maxHeight = $(window).height() - 30;
+      	img.width(img.width() * maxHeight/img.height());
+      	img.height(maxHeight);
+      }
+      break;
+
     break;
   }
 });

@@ -28,10 +28,10 @@ String.prototype.beginsWith = function(prefix) {
 
 }(jQuery));
 
-var turl1 = "http://qkme.me/3qvhfl?id=226537473", 
+var turl1 = "images/pic06.jpg", 
 	turl2 = "http://imgur.com/uS5Ka", //"test/2.png", 
-	turl3 = "http://qkme.me/3qv28p", //test/3.jpg",
-	turl4 = "http://www.quickmeme.com/meme/3qv1p3/", //test/4.jpg"
+	turl3 = "test/3.jpg",
+	turl4 = "test/4.jpg"
 	turl5 = "http://imgur.com/a/kinkC";//"test/5.jpg"
 testingJsonData = {
 "kind": "Listing", "data": {"modhash": "", "children": [
@@ -201,9 +201,7 @@ REDDIT_THROTTLE_MS = 2000;
 		$('<img />')
 	    .attr('src', img.url)
 	    .load(function(){
-			var scaledWidth = this.width;
 			var maxWidth = $(window).width() - 30;
-
 			var scaledWidth = Math.min(maxWidth, this.width);
 			var scaledHeight = this.height * ( scaledWidth / this.width );
 
