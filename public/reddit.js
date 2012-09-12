@@ -38,7 +38,7 @@ var turl1 = "images/pic06.jpg",
 	turl2 = "http://imgur.com/uS5Ka", //"test/2.png", 
 	turl3 = "http://qkme.me/3qv28p", //test/3.jpg",
 	turl4 = "http://www.quickmeme.com/meme/3qv1p3/", //test/4.jpg"
-	turl5 = "test/5.jpg"
+	turl5 = "http://imgur.com/a/kinkC";//"test/5.jpg"
 testingJsonData = {
 "kind": "Listing", "data": {"modhash": "", "children": [
 {"kind": "t3", "data": {"domain": "imgur.com", "banned_by": null, "media_embed": {}, "subreddit": "pics", "selftext_html": null, "selftext": "", "likes": null, "link_flair_text": null, "id": "yzys5", "clicked": false, "title": "Found a strawBEARy!", "num_comments": 277, "score": 2141, "approved_by": null, "over_18": false, "hidden": false, "thumbnail": "http://f.thumbs.redditmedia.com/HNzAVvyLCx8ZidvG.jpg", "subreddit_id": "t5_2qh0u", "edited": false, "link_flair_css_class": null, "author_flair_css_class": null, "downs": 6498, "saved": false, "is_self": false, "permalink": "/r/pics/comments/yzys5/found_a_strawbeary/", "name": "t3_yzys5", "created": 1346233214.0, "url": turl1, "author_flair_text": null, "author": "Taybow", "created_utc": 1346208014.0, "media": null, "num_reports": null, "ups": 8639}},
@@ -267,43 +267,27 @@ REDDIT_THROTTLE_MS = 2000;
 		this.listView.debug();
 	}
 
-
-	//imgur Handling code
-
-/*
-  imgurCBAlbum = function(data, self) {
-    console.log(data);
-    var images = data.album && data.album.images;
-    if(!images) return;
-
-    // TODO: actually add the album along with relevant titles/descriptions
-    console.log("Not able to support imgur albums yet", images.length, "images not being added");
-  }
-
-
-  function expandImgurAlbum(filePath) {
-    var id = filePath.slice(2,filePath.length), // cut off a/ prefix
-        url = "http://api.imgur.com/2/album/" + id + ".json";
-
-      $.getJSON(url, function(data) { 
-        a.imgurCBAlbum(data,);
-      });    
-  }
-*/
-  PicFetcher.prototype.getImgurLinks = function(item, expandAlbums) {
+  PicFetcher.prototype.getImgurLinks = function(item) {
   	var self = this;
-  	/*
-  if(filePath.beginsWith("a/")) {
-    if(expandAlbums) return expandImgurAlbum(item)
-    else return [];
-  }
-  */
 
   var split = item.url.split("/");
-  var imageHash = split[split.length-1];
+  var id = split[split.length-1];
 
-  var url = "http://api.imgur.com/2/image/" + imageHash + ".json";
+  if("a" ===split[split.length-2]) { // Album
+  	var imgurCBAlbum = function(data) {
+	    var images = data.album && data.album.images;
+	    if(!images) return;
 
+	    // TODO: actually add the album along with relevant titles/descriptions
+	    //console.log("Not able to support imgur albums yet", images.length, "images not being added");
+	  }
+	  var url = "http://api.imgur.com/2/album/" + id + ".json";
+
+      $.getJSON(url, function(data) { 
+        imgurCBAlbum(data);
+      });	  
+  } else { // normal image
+	  var url = "http://api.imgur.com/2/image/" + id + ".json";
 
 	  var imgurCBImage = function(data) {
 	    item.url = data.image && data.image.links && data.image.links.original;
@@ -312,7 +296,9 @@ REDDIT_THROTTLE_MS = 2000;
       $.getJSON(url, function(data) { 
         imgurCBImage(data);
       });
+
   }
+}
 
   // end imgur handling
 
