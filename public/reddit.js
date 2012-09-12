@@ -270,38 +270,27 @@ REDDIT_THROTTLE_MS = 2000;
   PicFetcher.prototype.getImgurLinks = function(item) {
   	var self = this;
 
-  var split = item.url.split("/");
-  var id = split[split.length-1];
+	  var split = item.url.split("/");
+	  var id = split[split.length-1];
 
-  if("a" ===split[split.length-2]) { // Album
-  	var imgurCBAlbum = function(data) {
+	  if("a" ===split[split.length-2]) { // Album
+      $.getJSON(url, function(data) { 
 	    var images = data.album && data.album.images;
 	    if(!images) return;
 
 	    // TODO: actually add the album along with relevant titles/descriptions
 	    //console.log("Not able to support imgur albums yet", images.length, "images not being added");
-	  }
-	  var url = "http://api.imgur.com/2/album/" + id + ".json";
-
-      $.getJSON(url, function(data) { 
-        imgurCBAlbum(data);
       });	  
-  } else { // normal image
-	  var url = "http://api.imgur.com/2/image/" + id + ".json";
+	  } else { // normal image
+		  var url = "http://api.imgur.com/2/image/" + id + ".json";
 
-	  var imgurCBImage = function(data) {
-	    item.url = data.image && data.image.links && data.image.links.original;
-	    self.appendImage(item);
+	      $.getJSON(url, function(data) { 
+		    item.url = data.image && data.image.links && data.image.links.original;
+		    self.appendImage(item);
+	      });
+
 	  }
-      $.getJSON(url, function(data) { 
-        imgurCBImage(data);
-      });
-
-  }
-}
-
-  // end imgur handling
-
+	}
 	PicFetcher.prototype.getQuickMemeLink = function(item) {
 		var split = item.url.split("/");
 		var hash = split[split.length-1];
