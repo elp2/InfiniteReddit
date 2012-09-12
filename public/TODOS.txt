@@ -1,7 +1,10 @@
-Welcome/introduction page
+Welcome/introduction page + how to request different subreddits
 Proxy console.X commands for browsers without console
-Top Navigation bar showing current reddits/other stats
-What's the usage of the data- tags in HTML?
+Image info bar: subreddit/submitter/text/upvotes
+Space to go down the imgage, z to zoom it to fit
+Zoom things in a bit if we're Just missing it scrolling in
+Make sure top doesn't cover up image if we're at the top of the page
+Clean up the directories / make it requestable from the / not index
 
 V2 - 
 Swipe support for touch devices

@@ -207,14 +207,8 @@ REDDIT_THROTTLE_MS = 2000;
 			var scaledWidth = Math.min(maxWidth, this.width);
 			var scaledHeight = this.height * ( scaledWidth / this.width );
 
-			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
-			if( self.imgFn) {
-				self.imgFn(img, scaledWidth, scaledHeight, self.autoScrollToNext);
-			} else {
-				// TODO: standardize calls
-			//	listView.appendImage(img, scaledWidth, scaledHeight, self.autoScrollToNext);
-			}
-			self.autoScrollToNext = false;
+			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image			
+			self.imgFn(img, scaledWidth, scaledHeight, self.autoScrollToNext);
 	    });
 	}
 
