@@ -6,28 +6,6 @@ String.prototype.beginsWith = function(prefix) {
     return this.indexOf(prefix)==0;
 };
 
-/* jQuery Tiny Pub/Sub - v0.7 - 10/27/2011
- * http://benalman.com/
- * Copyright (c) 2011 "Cowboy" Ben Alman; Licensed MIT, GPL */
-
-(function($) {
-
-  var o = $({});
-
-  $.subscribe = function() {
-    o.on.apply(o, arguments);
-  };
-
-  $.unsubscribe = function() {
-    o.off.apply(o, arguments);
-  };
-
-  $.publish = function() {
-    o.trigger.apply(o, arguments);
-  };
-
-}(jQuery));
-
 var turl1 = "images/pic06.jpg", 
 	turl2 = "http://imgur.com/uS5Ka", //"test/2.png", 
 	turl3 = "test/3.jpg",
@@ -228,7 +206,7 @@ REDDIT_THROTTLE_MS = 2000;
 			var m = matches[i];
 			for (var j = m.prefixes.length - 1; j >= 0; j--) {
 				var prefix = m.prefixes[j];
-				if(0==data.url.indexOf("http://"+prefix)) {
+				if(data.url.beginsWith("http://"+prefix)) {
 					m.fn();
 					return;
 				}
