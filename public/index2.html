@@ -53,13 +53,11 @@ function putSlideAt(upcoming, i) {
 	.attr('className', 'loading')
 	.width(slide.width)
 	.height(slide.height)
-//	el.className = 'loading';
-//	el.src(slide.url;
-//	el.width = slide.width;
-//	el.height = slide.height;
 	.data('orig-width', slide.width)
-	.data('orig-height', slide.height);
-	
+	.data('orig-height', slide.height)
+	.data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
+	;
+
 	el = gallery.masterPages[i].querySelector('span');
 	el.innerHTML = slide.desc;
 }
@@ -89,22 +87,32 @@ gallery.onMoveIn(function () {
 	/(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
 });
 
+$(document).keydown(function(event) {
+
 function resetImageSize(){
-	      var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // TODO: replace w jquery selector
       	img.width(img.data('orig-width'));
       	img.height(img.data('orig-height'));
-
+      	var origTop = img.data('orig-top');
+      	if(null != origTop) { 
+      		img.offset({top:origTop}); 
+      		img.data('orig-top', null);
+      	}
 }
-$(document).keydown(function(event) {
-  var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
-  switch(event.which) {
-    case jCode:
-    case aCode:
+
+  var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // Replace with JQuery selector
+  globalimg = img;
+  function advanceImg() {
 	  resetImageSize();
       picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
       if( !gallery.next() ) {
       	// TODO: Show some kind of loading screen... maybe let it advance 1 and then replace it as the image comes in
       }
+  }
+  var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
+  switch(event.which) {
+    case jCode:
+    case aCode:
+    	advanceImg();
       break;
 
     case kCode:
@@ -114,20 +122,33 @@ $(document).keydown(function(event) {
       break;
 
     case spaceCode:
+		if(null == img.data('orig-top')) { 
+			img.data('orig-top',img.offset().top);
+  		}
+
+    	var imgBottom = img.offset().top + img.height(),
+    	    bottomOffScreen = $(window).height() < imgBottom;
+    	if(bottomOffScreen) {
+    		img.offset({top:img.offset().top - $(window).height()});
+    	} else {
+    		advanceImg();
+    	}
+    //TODO: make these more easily pageable by an integer number of times
     // TODO: advance down the image if it's super tall, advance to next if we're at the bottom / it was already visible
       break;
 
     case dCode:
     case lCode:
-      var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // TODO: replace w jquery selector
       var zoomed = img.width() != img.data('orig-width'); 
       if(zoomed) { 
       	img.width(img.data('orig-width'));
       	img.height(img.data('orig-height'));
       } else {
       	var maxHeight = $(window).height() - 30;
-      	img.width(img.width() * maxHeight/img.height());
-      	img.height(maxHeight);
+      	if(maxHeight<img.height()) {
+	      	img.width(img.width() * maxHeight/img.height());
+	      	img.height(maxHeight);
+      	}
       }
       break;
 
