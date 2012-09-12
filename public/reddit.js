@@ -28,13 +28,7 @@ String.prototype.beginsWith = function(prefix) {
 
 }(jQuery));
 
-
-//Imgur Album= http://imgur.com/a/kinkC  
-
-// http://qkme.me/3qv28p 
-// http://www.quickmeme.com/meme/3qv1p3/
-
-var turl1 = "images/pic06.jpg",
+var turl1 = "http://qkme.me/3qvhfl?id=226537473", 
 	turl2 = "http://imgur.com/uS5Ka", //"test/2.png", 
 	turl3 = "http://qkme.me/3qv28p", //test/3.jpg",
 	turl4 = "http://www.quickmeme.com/meme/3qv1p3/", //test/4.jpg"
@@ -71,7 +65,8 @@ REDDIT_THROTTLE_MS = 2000;
 		this.autoScrollToNext = true;
 
 		if(this.onlineMode) {
-			this.seenURLs = getSeenURLs();
+			this.seenURLs = {}; 
+			// TODO: TESTING getSeenURLs();
 		} else {
 			localStorage.clear();
 			this.seenURLs = {};
@@ -165,7 +160,7 @@ REDDIT_THROTTLE_MS = 2000;
 		}
 
 		if(!isImageFile(item.url)) {
-			console.log(item.url, ": is not an image")
+			console.log(item.url, ": is not an image", item)
 			return false;
 		}
 		return true;
@@ -233,10 +228,13 @@ REDDIT_THROTTLE_MS = 2000;
 			var m = matches[i];
 			for (var j = m.prefixes.length - 1; j >= 0; j--) {
 				var prefix = m.prefixes[j];
-				if(0==data.url.indexOf("http://"+prefix))
+				if(0==data.url.indexOf("http://"+prefix)) {
 					m.fn();
+					return;
+				}
 			};
 		};
+		console.log("Couldn't handle: ", data.url, data );
 	}
 
 	PicFetcher.prototype.handlePosts = function(data) {
@@ -247,10 +245,11 @@ REDDIT_THROTTLE_MS = 2000;
 
 		var self = this;
 		$.each(data.data.children, function(i,item){
-			if(isImageFile(item.data.url))
+			if(isImageFile(item.data.url)) {
 				self.appendImage(item.data)
-
-			self.enrichItem(item.data);
+			} else {
+				self.enrichItem(item.data);
+			}
     	});
 
 		this.resetTimes();
@@ -295,6 +294,8 @@ REDDIT_THROTTLE_MS = 2000;
 		var split = item.url.split("/");
 		var hash = split[split.length-1];
 		if(""===hash) hash = split[split.length-2]; // handle trailing slash
+		if(hash.indexOf("?")!=-1)
+			hash = hash.slice(0,hash.indexOf("?"));
 
 		item.url = "http://i.qkme.me/" + hash + ".jpg";
 		this.appendImage(item);
