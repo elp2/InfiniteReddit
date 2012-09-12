@@ -205,6 +205,14 @@ REDDIT_THROTTLE_MS = 2000;
 			var scaledWidth = Math.min(maxWidth, this.width);
 			var scaledHeight = this.height * ( scaledWidth / this.width );
 
+			// Shrink things if doing so slightly will make them fit completely on the page
+			var acceptableShrink = 0.8;
+			var maxHeight = $(window).height() - 30;
+			if(maxHeight<scaledHeight && maxHeight/scaledHeight>acceptableShrink){
+				scaledWidth = scaledWidth * (maxHeight/scaledHeight);
+				scaledHeight = maxHeight;
+			}
+
 			self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image			
 			self.imgFn(img, scaledWidth, scaledHeight, self.autoScrollToNext);
 	    });
