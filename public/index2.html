@@ -128,7 +128,7 @@ $(document).ready(function(){
 		}
 	};
 
-  var onlineMode = window.location.toString().substring(0,4) == "http" || window.location.toString().split("#")[1] != "test";
+  var onlineMode = window.location.toString().split("#")[1] != "test";
   picFetcher = new reddit.PicFetcher(gallery, { onlineMode: onlineMode, imgFn: addImage  })
   picFetcher.setSubreddits(getSubreddits());
 

@@ -1,0 +1,86 @@
+/*
+
+V1:
+
+==QUICKMEME: http://i.qkme.me/3qv48j?id=226520371.jpg : is not an image 
+http://qkme.me/3qvhfl?id=226537473 <- has unnecessary id= param
+
+
+===Videos (and make them autoplay... configurable by option)
+== VIMEO
+Couldn't handle:  http://vimeo.com/45569479 
+
+Couldn't handle:  http://www.youtube.com/watch?v=yFiv7v_Nt4Y reddit.js:243
+
+ http://www.youtube.com/watch?v=juz11qFhlOM&amp;feature=youtu.be 
+ Couldn't handle:  http://www.youtube.com/watch?v=MVB1eQn2uwA 
+Couldn't handle:  http://www.youtube.com/watch?v=pZCyOWLrRTE&amp;feature=share reddit.js:243
+Couldn't handle:  http://www.youtube.com/watch?v=5ghsxiSYXhE 
+Couldn't handle:  http://www.youtube.com/watch?v=gd_QiyIw7Sk 
+Couldn't handle:  https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp reddit.js:243
+Couldn't handle:  https://www.youtube.com/watch?feature=endscreen&amp;v=aCca5mPMp9A&amp;NR=1 
+
+
+
+
+==GIFBIN
+Couldn't handle:  http://www.gifbin.com/f/986720 reddit.js:243
+
+
+----LATER--------------
+==FLICKR
+http://www.flickr.com/photos/19299984@N08/7976507568/ 
+// http://www.flickr.com/services/api/
+
+==DEVIANTART
+Couldn't handle:  http://my.deviantart.com/messages/#/d5egyth 
+// required login
+
+==TUMBLR
+ Couldn't handle:  http://dan-cutler.tumblr.com/image/31273545340 reddit.js:243
+// needs API key
+
+
+-------ERRORS------
+==XKCD
+ http://www.xkcd.com/1107/ 
+
+XMLHttpRequest cannot load http://xkcd.com/1107/info.0.json. Origin http://infinitereddit.aws.af.cm is not allowed by Access-Control-Allow-Origin.
+
+
+	//http://xkcd.com/json.html
+  PicFetcher.prototype.getXKCDLink = function(item) {
+  	var self = this;
+
+	  var split = item.url.split("/");
+	  var id = split[split.length-1];
+	  if(""==id) id = split[split.length-2];
+
+	  var url = "http://xkcd.com/" + id + "/info.0.json"
+      $.getJSON(url, function(data) { 
+      	console.log("XKCD!", data);
+	    item.url = data.image && data.image.links && data.image.links.original;
+	    self.appendImage(item);
+      });
+	}
+
+
+
+
+==IMUGR
+GET http://i.imgur.com/PfURa.png  <<-- error?  Seems to be working now
+GET http://i.imgur.com/PfURa.png  jquery-1.8.0.js:2313
+jQuery.extend.attr jquery-1.8.0.js:2313
+jQuery.extend.access jquery-1.8.0.js:821
+jQuery.fn.extend.attr jquery-1.8.0.js:2000
+PicFetcher.appendImage reddit.js:208
+PicFetcher.handlePosts reddit.js:255
+jQuery.extend.each jquery-1.8.0.js:611
+PicFetcher.handlePosts reddit.js:253
+PicFetcher._getMorePosts.afterTag reddit.js:136
+jQuery.Callbacks.fire jquery-1.8.0.js:973
+jQuery.Callbacks.self.fireWith jquery-1.8.0.js:1080
+done jquery-1.8.0.js:7583
+jQuery.ajaxTransport.send.script.onload.script.onreadystatechange
+
+*/
