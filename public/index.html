@@ -84,6 +84,23 @@ $(document).ready(function(){
   picFetcher.setSubreddits(getSubreddits());
   picFetcher.getMorePosts();
 
+
+    /* should be in the ListView 
+
+        var scaledWidth = this.width;
+      var maxWidth = $(window).width() - 30
+      img.scaledWidth = Math.min(maxWidth, this.width);
+      img.scaledHeight = this.height * ( img.scaledWidth / this.width );
+
+      var imageDiv = imageTemplate(img);
+      var listItem = listView.append($(imageDiv));
+      self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image
+      if(self.autoScrollToNext) {
+        self.autoScrollToNext = false;        
+          window.scrollTo( 0, listItem.$el.offset().top);
+      }
+      */
+
   !function() {
     var spinner = $($('#spinner-template').html());
     var updateScheduled = false;

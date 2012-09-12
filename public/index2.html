@@ -41,13 +41,11 @@ for (i=0; i<3; i++) {
 	gallery.masterPages[i].appendChild(el);
 
 	el = document.createElement('span');
-	el.innerHTML = "Loading: " + i + "";
+	el.innerHTML = "";
 	gallery.masterPages[i].appendChild(el);
 }
 
 function putSlideAt(upcoming, i) {
-	console.log("upcoming = ", upcoming, "so switch", i)
-
 	var slide = slides[upcoming] ? slides[upcoming] : {url:"", width:250, height:250, desc: ""};
 	el = gallery.masterPages[i].querySelector('img');
 	el.className = 'loading';
@@ -92,7 +90,6 @@ $(document).keydown(function(event) {
       picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
       if( !gallery.next() ) {
       	// TODO: Show some kind of loading screen... maybe let it advance 1 and then replace it as the image comes in
-      	console.log("!!!!!!!!!!!No more to advance... loading");
       }
       break;
 
@@ -118,12 +115,10 @@ $(document).ready(function(){
 		var el, 
 			newPageI = gallery.options.numberOfPages;
 
-		// TODO: add to the first pages if they haven't had anything added yet
-		console.log("Adding: ", img.url, "@", newPageI, w, "x", h);
-
 		gallery.updatePageCount(newPageI + 1);
 		slides.push({url:img.url, width:w, height:h, desc:img.title});		
 
+		// Special case to get the first images out there.  
 		if(1 == firstImages) {
 			putSlideAt(1,2);
 			firstImages++;
@@ -133,7 +128,7 @@ $(document).ready(function(){
 		}
 	};
 
-  var onlineMode = true; //window.location.toString().substring(0,4) == "http";
+  var onlineMode = false;// window.location.toString().substring(0,4) == "http";
   picFetcher = new reddit.PicFetcher(gallery, { onlineMode: onlineMode, imgFn: addImage  })
   picFetcher.setSubreddits(getSubreddits());
 
