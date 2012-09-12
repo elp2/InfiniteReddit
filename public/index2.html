@@ -48,13 +48,17 @@ for (i=0; i<3; i++) {
 function putSlideAt(upcoming, i) {
 	var slide = slides[upcoming] ? slides[upcoming] : {url:"", width:250, height:250, desc: ""};
 	el = gallery.masterPages[i].querySelector('img');
-	el.className = 'loading';
-	el.src = slide.url;
-	el.width = slide.width;
-	el.height = slide.height;
 	var img = $(el);
-	img.data('orig-width', slide.width);
-	img.data('orig-height', slide.height);
+	img.attr('src', slide.url)
+	.attr('className', 'loading')
+	.width(slide.width)
+	.height(slide.height)
+//	el.className = 'loading';
+//	el.src(slide.url;
+//	el.width = slide.width;
+//	el.height = slide.height;
+	.data('orig-width', slide.width)
+	.data('orig-height', slide.height);
 	
 	el = gallery.masterPages[i].querySelector('span');
 	el.innerHTML = slide.desc;
@@ -85,11 +89,18 @@ gallery.onMoveIn(function () {
 	/(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
 });
 
+function resetImageSize(){
+	      var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // TODO: replace w jquery selector
+      	img.width(img.data('orig-width'));
+      	img.height(img.data('orig-height'));
+
+}
 $(document).keydown(function(event) {
-  var jCode = 74, kCode = 75, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32, zCode=90;
+  var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
   switch(event.which) {
     case jCode:
     case aCode:
+	  resetImageSize();
       picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
       if( !gallery.next() ) {
       	// TODO: Show some kind of loading screen... maybe let it advance 1 and then replace it as the image comes in
@@ -98,18 +109,16 @@ $(document).keydown(function(event) {
 
     case kCode:
     case sCode:
+      resetImageSize();
       gallery.prev();
-      break;
-
-    case dCode:
-    // Debugging
       break;
 
     case spaceCode:
     // TODO: advance down the image if it's super tall, advance to next if we're at the bottom / it was already visible
       break;
 
-    case zCode:
+    case dCode:
+    case lCode:
       var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // TODO: replace w jquery selector
       var zoomed = img.width() != img.data('orig-width'); 
       if(zoomed) { 
