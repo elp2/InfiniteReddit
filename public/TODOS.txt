@@ -1,9 +1,8 @@
-detect when scrolling is happening and need to refresh before reaching bottom
-
+Welcome/introduction page
 Proxy console.X commands for browsers without console
-
-Issue where j is not advancing us properly to the top so it ends up needing two j's to advance.  1 to get us to the top properly, one to advance to next.
- 
 Top Navigation bar showing current reddits/other stats
-
 What's the usage of the data- tags in HTML?
+
+V2 - 
+Swipe support for touch devices
+Configure how scaling/images/etc work

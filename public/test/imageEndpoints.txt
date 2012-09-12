@@ -2,10 +2,6 @@
 
 V1:
 
-==QUICKMEME: http://i.qkme.me/3qv48j?id=226520371.jpg : is not an image 
-http://qkme.me/3qvhfl?id=226537473 <- has unnecessary id= param
-
-
 ===Videos (and make them autoplay... configurable by option)
 == VIMEO
 Couldn't handle:  http://vimeo.com/45569479 
@@ -23,8 +19,6 @@ Couldn't handle:  https://www.youtube.com/watch?feature=endscreen&amp;v=aCca5mPM
 
 
 
-==GIFBIN
-Couldn't handle:  http://www.gifbin.com/f/986720 reddit.js:243
 
 
 ----LATER--------------
@@ -40,6 +34,9 @@ Couldn't handle:  http://my.deviantart.com/messages/#/d5egyth
  Couldn't handle:  http://dan-cutler.tumblr.com/image/31273545340 reddit.js:243
 // needs API key
 
+==GIFBIN
+Couldn't handle:  http://www.gifbin.com/f/986720 reddit.js:243
+// No API, no obvious translation
 
 -------ERRORS------
 ==XKCD
