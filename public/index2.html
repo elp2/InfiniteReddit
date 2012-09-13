@@ -146,6 +146,10 @@ function resetImageSize(){
       	img.width(img.data('orig-width'));
       	img.height(img.data('orig-height'));
       } else {
+		if(null != img.data('orig-top')) {
+			img.offset({top:img.data('orig-top')})
+		}
+
       	var maxHeight = $(window).height() - 30;
       	if(maxHeight<img.height()) {
 	      	img.width(img.width() * maxHeight/img.height());
