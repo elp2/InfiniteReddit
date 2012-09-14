@@ -8,8 +8,8 @@ String.prototype.beginsWith = function(prefix) {
 
 var turl1 = "https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
 turl2 = "http://imgur.com/uS5Ka",  //"test/2.png", 
-turl3 = "test/3.jpg", 
-turl4 = "test/4.jpg"
+turl3 = "test/images/3.jpg", 
+turl4 = "test/images/4.jpg"
 turl5 = "http://imgur.com/a/kinkC"; //"test/5.jpg"
 testingJsonData = {
     "kind": "Listing","data": {"modhash": "","children": [
