@@ -233,11 +233,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         
         this.resetTimes();
     }
-    
-    // Debug
-    PicFetcher.prototype.debug = function() {
-    }
-    
+        
     PicFetcher.prototype.getImgurLinks = function(item) {
         var self = this;
         

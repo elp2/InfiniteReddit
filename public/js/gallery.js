@@ -172,7 +172,6 @@ $(document).ready(function() {
         var maxWidth = $(window).width() - 30;
         var scaledWidth = Math.min(maxWidth, img.width());
         var scaledHeight = img.height() * (scaledWidth / img.width());
-        console.debug( img, "sw:", scaledWidth, "sh", scaledHeight);
 
         // Shrink things if doing so slightly will make them fit completely on the page
         var acceptableShrink = 0.75;
