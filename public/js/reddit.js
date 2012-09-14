@@ -39,7 +39,6 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         
         this.canRequestAt = (new Date()).getTime();
         this.waitingForResponse = false;
-        this.autoScrollToNext = true;
         
         if (this.onlineMode) {
             this.seenURLs = {};
@@ -68,14 +67,11 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         return (throttleTime);
     }
     
-    PicFetcher.prototype.getMorePosts = function(autoScrollToNext) {
+    PicFetcher.prototype.getMorePosts = function() {
         if (this.waitingForResponse) {
             return; // already have a live request so do nothing
         }
         this.waitingForResponse = true;
-        if (autoScrollToNext) {
-            this.autoScrollToNext = true;
-        }
         
         var throttleTime = this.getThrottleTime();
         var self = this;
@@ -170,30 +166,21 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
     // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
     }
     
-    PicFetcher.prototype.appendImage = function(img) {
-        if(!this.shouldShowImage(img))
+    PicFetcher.prototype.appendImage = function(item) {
+        if(!this.shouldShowImage(item))
             return;
         
-        this.seenURLs[img.url] = true;
+        this.seenURLs[item.url] = true;
         var self = this;
        	// Insert preloaded image after it finishes loading via "load" callback
         $('<img />')
-        .attr('src', img.url)
+        .attr('src', item.url)
         .load(function() {
-            var maxWidth = $(window).width() - 30;
-            var scaledWidth = Math.min(maxWidth, this.width);
-            var scaledHeight = this.height * (scaledWidth / this.width);
+            var img = $(this);   
+            img.height(this.height);
+            img.width(this.width);
 
-            // Shrink things if doing so slightly will make them fit completely on the page
-            var acceptableShrink = 0.75;
-            var maxHeight = $(window).height() - 30;
-            if (maxHeight < scaledHeight && maxHeight / scaledHeight > acceptableShrink) {
-                scaledWidth = scaledWidth * (maxHeight / scaledHeight);
-                scaledHeight = maxHeight;
-            }
-            
-            self.setSeenURL(img.url); // TODO: only call this when it's shown as our active image			
-            self.imgFn(img, scaledWidth, scaledHeight, self.autoScrollToNext);
+            self.imgFn(item, img);
         });
     }
 
@@ -275,7 +262,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
             });        
         }
     }
-    
+
     PicFetcher.prototype.getQuickMemeLink = function(item) {
         var split = item.url.split("/");
         var hash = split[split.length - 1];

@@ -50,7 +50,9 @@ $(document).ready(function() {
             .data('orig-width', slide.width)
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
-            ;            
+            ;          
+
+            picFetcher.setSeenURL(img.url);  
         }
 
         setDetails(page.find("#details"), slide.item);
@@ -132,7 +134,7 @@ $(document).ready(function() {
             
             case dCode:
             case lCode:
-                var zoomed = img.width() != img.data('orig-width');
+                var zoomed = img.width() != img.data('orig-width');                
                 if (zoomed) {
                     img.width(img.data('orig-width'));
                     img.height(img.data('orig-height'));
@@ -140,12 +142,10 @@ $(document).ready(function() {
                     if (null != img.data('orig-top')) {
                         img.offset({top: img.data('orig-top')})
                     }
-                    
-                    var maxHeight = $(window).height() - 30;
-                    if (maxHeight < img.height()) {
-                        img.width(img.width() * maxHeight / img.height());
-                        img.height(maxHeight);
-                    }
+                    var zoomedSize = fitToWindow(img, true);
+
+                    img.width(zoomedSize.width);
+                    img.height(zoomedSize.height);
                 }
                 break;
                 
@@ -167,11 +167,33 @@ $(document).ready(function() {
         }        
     }
 
+    function fitToWindow(img, forceShrink) {
+        img = $(img);
+        var maxWidth = $(window).width() - 30;
+        var scaledWidth = Math.min(maxWidth, img.width());
+        var scaledHeight = img.height() * (scaledWidth / img.width());
+        console.debug( img, "sw:", scaledWidth, "sh", scaledHeight);
+
+        // Shrink things if doing so slightly will make them fit completely on the page
+        var acceptableShrink = 0.75;
+        var maxHeight = $(window).height() - 70*2; // TODO: This is 2x the titlebar... move its centering down 64px to save 64px on the bottom
+        if(forceShrink || (maxHeight < scaledHeight && maxHeight / scaledHeight > acceptableShrink)) {
+            scaledWidth = scaledWidth * (maxHeight / scaledHeight);
+            scaledHeight = maxHeight;
+        }
+
+        console.debug("sw:", scaledWidth, "sh", scaledHeight);
+        return({width:scaledWidth, height:scaledHeight});
+    }
+    function imgFn(item, img)
+    {
+        var fittedSize = fitToWindow(img);
+        addSlide({url: item.url, width: fittedSize.width, height: fittedSize.height, item: item});
+    }
+
     var onlineMode = window.location.toString().split("#")[1] != "test";
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
-                                        imgFn: function(img, w, h, advanceToNext) {
-                                                    addSlide({url: img.url, width: w, height: h, item: img});
-                                                }, 
+                                        imgFn: imgFn,
                                         htmlFn: function (item, html) {
                                                     addSlide({html: html, item: item});
                                         },
