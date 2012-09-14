@@ -24,6 +24,11 @@ $(document).ready(function() {
         el.find("#gallery-img").load(function() {this.className='';}); 
     }
     
+    var detailsTemplate = $('#details-template').html();
+    function setDetails(details, item) {
+        details.html(_.template(detailsTemplate, item, {variable:"item"}));
+    }
+    
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         
@@ -33,10 +38,10 @@ $(document).ready(function() {
 
         if (slide.html) {
             img.hide();
-            htmlSpan.html("TEST!!!<h1>h1</h1>");
-
+            htmlSpan.show();
+            htmlSpan.html(slide.html);
         } else {
-            htmlSpan.html("");
+            htmlSpan.hide();
             img.show();
             img.attr('src', slide.url)
             .attr('className', 'loading')
@@ -47,7 +52,8 @@ $(document).ready(function() {
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;            
         }
-        page.find("#description").html(slide.item.title);
+
+        setDetails(page.find("#details"), slide.item);
     }
     
     gallery.onFlip(function() {
@@ -160,17 +166,16 @@ $(document).ready(function() {
             firstImages++;
         }        
     }
-    
-    function addImage(img, w, h, advanceToNext) {
-        addSlide({url: img.url, width: w, height: h, item: img});
-    }
-    
-    function addHTML(item, html) {
-        addSlide({html: html, item: item});
-    }
-    
+
     var onlineMode = window.location.toString().split("#")[1] != "test";
-    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, imgFn: addImage, htmlFn: addHTML})
+    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
+                                        imgFn: function(img, w, h, advanceToNext) {
+                                                    addSlide({url: img.url, width: w, height: h, item: img});
+                                                }, 
+                                        htmlFn: function (item, html) {
+                                                    addSlide({html: html, item: item});
+                                        },
+                                        });
     picFetcher.setSubreddits(getSubreddits());
     
     function start() {

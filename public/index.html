@@ -25,12 +25,16 @@
 </body>
 </html>
 
+<script type=text/html id="details-template">
+<span id='details-title'><%= item.title %></span> on <span id='details-subreddit'><%= item.subreddit %></span>
+</script>
+
 <script type=text/html id='gallery-page'>
 <div>
 	<img class='loading' id='gallery-img' width=250 height=250 src=''/>
 	<span id='htmlSpan'></span>
 	<!-- Only one of the img or the htmlSpan should be active at any time-->
-	<span id='description'><!-- TODO: put the full details in this as a div --></span>
+	<div id='details'></div>
 </div>
 </script>
 
