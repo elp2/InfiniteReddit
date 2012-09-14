@@ -19,30 +19,22 @@ $(document).ready(function() {
     // Load initial data
     for (i = 0; i < 3; i++) {
         page = i == 0 ? slides.length - 1 : i - 1;
-        // TODO: switch to templating
-        el = document.createElement('img');
-        el.className = 'loading';
-        el.src = "";
-        el.width = 250;
-        el.height = 250;
-        el.onload = function() {
-            this.className = '';
-        }
-        gallery.masterPages[i].appendChild(el);
-        
-        el = document.createElement('span');
-        el.innerHTML = "";
-        gallery.masterPages[i].appendChild(el);
+
+        el = $(_.template($('#gallery-page').html())());
+        $(gallery.masterPages[i]).append(el);
+
+        el.find("#gallery-img").load(function() {this.className='';}); 
     }
     
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         
+        var page = $(gallery.masterPages[i]);
         if (slide.html) {
             
-        } else {            
-            el = gallery.masterPages[i].querySelector('img');
-            var img = $(el);
+        } else {
+            var img = page.find("#gallery-img");
+
             img.attr('src', slide.url)
             .attr('className', 'loading')
             .width(slide.width)
@@ -52,10 +44,7 @@ $(document).ready(function() {
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;            
         }
-
-        el = gallery.masterPages[i].querySelector('span');
-        el.innerHTML = slide.item.title;
-        console.log(slides);
+        page.find("#description").html(slide.item.title);
     }
     
     gallery.onFlip(function() {
@@ -95,8 +84,7 @@ $(document).ready(function() {
             }
         }
         
-        var img = $(gallery.masterPages[gallery.currentMasterPage].querySelector('img')); // Replace with JQuery selector
-        globalimg = img;
+        var img = $(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img"); 
         function advanceImg() {
             resetImageSize();
             picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
@@ -209,7 +197,7 @@ $(document).ready(function() {
         return (reddits.split("+"))
     }
 
-    // TODO: Link this to a settings image.  Prevent normal CB's from happening from keypresses
+    // TODO: Tie into actual settings
     var configHtml = _.template($('#settings-modal').html())();
     $('#wrapper').avgrund({
         height: 400,
