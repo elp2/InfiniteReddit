@@ -18,7 +18,9 @@
 			overlayClass: '',
 			enableStackAnimation: false,
 			onBlurContainer: '',
-			template: '<p>This is test popin content!</p>'
+			template: '<p>This is test popin content!</p>',
+			onActivate: function() {},
+			onDeactivate: function() {},
 		};
 		var options = $.extend(defaults, options);
 
@@ -74,6 +76,7 @@
 
 			// show popup
 			function activate() {
+				options.onActivate();
 				body.bind('keyup', onDocumentKeyup);
 				body.bind('click', onDocumentClick);
 
@@ -86,6 +89,7 @@
 				body.unbind('click', onDocumentClick);
 
 				body.removeClass('avgrund-active');
+				options.onDeactivate();
 			}
 
 			// init on click

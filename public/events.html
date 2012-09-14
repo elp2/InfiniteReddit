@@ -4,82 +4,6 @@
   <script type="text/javascript" src="reddit.js"></script>
 <script>
 
-
-  a = {};
-  a.imgurCBImage = function(data) {
-    var url = data.image && data.image.links && data.image.links.original;
-  }
-
-  a.imgurCBAlbum = function(data) {
-    console.log(data);
-    var images = data.album && data.album.images;
-    if(!images) return;
-
-    // TODO: actually add the album along with relevant titles/descriptions
-    console.log("Not able to support imgur albums yet", images.length, "images not being added");
-  }
-
-  function expandImgurAlbum(filePath) {
-    var id = filePath.slice(2,filePath.length), // cut off a/ prefix
-        url = "http://api.imgur.com/2/album/" + id + ".json";
-
-      $.getJSON(url, function(data) { 
-        a.imgurCBAlbum(data);
-      });    
-  }
-
-  function getImgurLinks(domain, filePath, expandAlbums) {
-/*
-  PNG Image: http://imgur.com/uS5Ka
-  Album: http://imgur.com/a/kinkC  
-*/
-  if(filePath.beginsWith("a/")) {
-    if(expandAlbums) return expandImgurAlbum(filePath)
-    else return [];
-  }
-
-  var url = "http://api.imgur.com/2/image/" + filePath + ".json";
-
-      $.getJSON(url, function(data) { 
-        a.imgurCBImage(data);
-      });
-  }
-
-
-
-
-var domain = "imgur.com";
-var filePath = "a/kinkC";
-//var filePath = "uS5Ka";
-getImgurLinks(domain, filePath,true);
-
-
-
-(function($) {
-
-  var o = $({});
-
-  $.subscribe = function() {
-    o.on.apply(o, arguments);
-  };
-
-  $.unsubscribe = function() {
-    o.off.apply(o, arguments);
-  };
-
-  $.publish = function() {
-    o.trigger.apply(o, arguments);
-  };
-
-}(jQuery));
-
-
-$(window).bind("test", function(a){console.log(a, "!");});
-
-$(window).trigger("test", "ELP");
-
-
-
     $('<img />')
       .attr('src', "http://www.asdfasdf.com/fasdfasdf")
       .load(function(){ console.log("loaded OK!");})
@@ -87,4 +11,22 @@ $(window).trigger("test", "ELP");
 
 
 
-</script><img src="images/pic06.jpg"></html>
+</script>
+
+<iframe class="youtube-player" type="text/html" width="640" height="385" src="http://www.youtube.com/embed/pZCyOWLrRTE" frameborder="0">
+</iframe>
+
+
+    <h1>∞.r</h1>
+    <h3>Subreddits:</h3>
+    <span id=subreddits-list>all</span>
+    <h3>Instructions</h3>
+    <ul><li><b>j/a</b> - advance to next</li>
+      <li><b>k/s</b> - go back</li>
+      <li><b>d/l</b> - zoom to fit</li>
+      <li><b>space</b> - scroll down image, advance to next</li> 
+    </ul>
+    <h3>Options</h3>
+    <ul><li>Show Videos</li><li>Auto Zoom Images</li></ul>
+
+</html>

@@ -7,12 +7,13 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<title>∞.r</title>
 	<link href="style.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="swipeview.js"></script>
-	<script type="text/javascript" src="jquery-1.8.0.js"></script>
-    <script type=text/javascript src=reddit.js></script>
-    <link rel="stylesheet" href="css/avgrund.css">
-	<script src="js/jquery.avgrund.js"></script>
-	<script src="underscore.js"></script>
+    <link href="css/avgrund.css" rel="stylesheet" type="text/css">
+
+	<script src="swipeview.js" type="text/javascript"></script>
+	<script src="jquery-1.8.0.js" type="text/javascript"></script>
+    <script src="reddit.js" type="text/javascript"></script>
+	<script src="js/jquery.avgrund.js" type="text/javascript"></script>
+	<script src="underscore.js" type="text/javascript" ></script>
 </head>
 
 <body>
@@ -49,6 +50,11 @@ for (i=0; i<3; i++) {
 
 function putSlideAt(upcoming, i) {
 	var slide = slides[upcoming] ? slides[upcoming] : {url:"", width:250, height:250, desc: ""};
+
+	if(slide.html) {
+
+	} else {
+
 	el = gallery.masterPages[i].querySelector('img');
 	var img = $(el);
 	img.attr('src', slide.url)
@@ -61,7 +67,8 @@ function putSlideAt(upcoming, i) {
 	;
 
 	el = gallery.masterPages[i].querySelector('span');
-	el.innerHTML = slide.desc;
+		el.innerHTML = slide.desc;
+	}
 }
 
 gallery.onFlip(function () {
@@ -88,8 +95,10 @@ gallery.onMoveIn(function () {
 	var className = gallery.masterPages[gallery.currentMasterPage].className;
 	/(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
 });
-
+var respondToKeys = true;
 $(document).keydown(function(event) {
+	if(!respondToKeys)
+		return;
 
 function resetImageSize(){
       	img.width(img.data('orig-width'));
@@ -181,8 +190,24 @@ $(document).ready(function(){
 		}
 	};
 
+	function addHTML(item, html) {
+		var el, 
+			newPageI = gallery.options.numberOfPages;
+
+		gallery.updatePageCount(newPageI + 1);
+		slides.push({html:html, desc:img.title});	
+		if(1 == firstImages) {
+			putSlideAt(1,2);
+			firstImages++;
+		} else if(0==firstImages){
+			putSlideAt(0,1);
+			firstImages++;
+		}
+
+	}
+
   var onlineMode = window.location.toString().split("#")[1] != "test";
-  picFetcher = new reddit.PicFetcher(gallery, { onlineMode: onlineMode, imgFn: addImage  })
+  picFetcher = new reddit.PicFetcher({ onlineMode: onlineMode, imgFn: addImage, htmlFn: addHTML })
   picFetcher.setSubreddits(getSubreddits());
 
   function getit() { picFetcher.getMorePosts()};
@@ -196,15 +221,18 @@ function getSubreddits() {
 }
 
 	// TODO: Link this to a settings image.  Prevent normal CB's from happening from keypresses
-
+		var configHtml = _.template($('#settings-modal').html())();
+		console.log(configHtml);
 		$('#wrapper').avgrund({
-			height: 200,
+			height: 400,
 			holderClass: 'custom',
 			showClose: true,
-			showCloseText: 'Close',
+			showCloseText: 'OK',
 			enableStackAnimation: true,
 			onBlurContainer: '.container',
-			template: _.template($('#settings-modal').html())(),
+			template: configHtml,
+			onActivate: function() {respondToKeys = false},
+			onDeactivate: function() {respondToKeys = true},
 		});
 
 
@@ -214,7 +242,19 @@ function getSubreddits() {
 </script>
 
     <script type=text/html id='settings-modal'>
-    <h1>SETTINGS GO HERE!SETTINGS GO HERE!SETTINGS GO HERE!SETTINGS GO HERE!</h1>
+    <h1>∞.r</h1>
+    <h3>Subreddits:</h3>
+    <span id='subreddits-list'>all</span>
+    <h3>Instructions</h3>
+    Hands off your mouse! Use the keyboard instead!
+    <ul><li><b>j/a</b> - advance to next</li>
+    	<li><b>k/s</b> - go back</li>
+    	<li><b>d/l</b> - zoom to fit</li>
+    	<li><b>space</b> - scroll down image, advance to next</li> 
+    </ul>
+    <h3>Options</h3>
+    <ul><li>Show Videos</li><li>Auto Zoom Images</li></ul>
+    <p><a href="TODO">About</a></p>
     </script>
 
 </body>

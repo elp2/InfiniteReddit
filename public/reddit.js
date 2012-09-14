@@ -6,7 +6,7 @@ String.prototype.beginsWith = function(prefix) {
     return this.indexOf(prefix) == 0;
 };
 
-var turl1 = "images/pic06.jpg", 
+var turl1 = "https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
 turl2 = "http://imgur.com/uS5Ka",  //"test/2.png", 
 turl3 = "test/3.jpg", 
 turl4 = "test/4.jpg"
@@ -21,7 +21,7 @@ testingJsonData = {
         
         ],"after": "t3_yyv33","before": null}};
 
-REDDIT_THROTTLE_MS = 2000;
+REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
 
 !function(window) {
     'use strict';
@@ -32,11 +32,11 @@ REDDIT_THROTTLE_MS = 2000;
     var reddit = window.reddit = {}
 
     // Packaging:
-    function PicFetcher(listView, options) {
+    function PicFetcher(options) {
         options = options || {};
         this.onlineMode = !!options.onlineMode;
         this.imgFn = options.imgFn; // TODO: get properly
-        this.listView = listView;
+        this.htmlFn = options.htmlFn;
         
         this.canRequestAt = (new Date()).getTime();
         this.waitingForResponse = false;
@@ -108,7 +108,8 @@ REDDIT_THROTTLE_MS = 2000;
             var self = this;
             $.getJSON(url, function(data) {
                 self.handlePosts(data);
-            });
+            })
+            .error(function() { alert("TODO: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
         } else {
             this.handlePosts(testingJsonData);
             this.afterTag = "";
@@ -171,14 +172,15 @@ REDDIT_THROTTLE_MS = 2000;
     // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
     }
     
+
+
     PicFetcher.prototype.appendImage = function(img) {
-        if (!this.shouldShowImage(img))
+        if(!this.shouldShowImage(img))
             return;
         
         this.seenURLs[img.url] = true;
-        var listView = this.listView;
         var self = this;
-        // Insert preloaded image after it finishes loading via "load" callback
+       	// Insert preloaded image after it finishes loading via "load" callback
         $('<img />')
         .attr('src', img.url)
         .load(function() {
@@ -198,6 +200,10 @@ REDDIT_THROTTLE_MS = 2000;
             self.imgFn(img, scaledWidth, scaledHeight, self.autoScrollToNext);
         });
     }
+
+    PicFetcher.prototype.appendHtml = function(item, html) {
+    	this.seenURLs[item.url] = true;
+    }
     
     PicFetcher.prototype.enrichItem = function(data) {
         var self = this;
@@ -207,6 +213,7 @@ REDDIT_THROTTLE_MS = 2000;
             {prefixes: ["qkme.me", "www.quickmeme.com", "quickmeme.com"],fn: function() {
                     self.getQuickMemeLink(data)
                 }}, 
+            {prefixes: ["youtube.com", "youtu.be"], fn:function(){ self.getYoutubeLink(data)}},
         ];
         
         for (var i = matches.length - 1; i >= 0; i--) {
@@ -232,7 +239,7 @@ REDDIT_THROTTLE_MS = 2000;
         
         var self = this;
         $.each(data.data.children, function(i, item) {
-            if (isImageFile(item.data.url)) {
+        	if (isImageFile(item.data.url)) {
                 self.appendImage(item.data)
             } else {
                 self.enrichItem(item.data);
@@ -242,15 +249,8 @@ REDDIT_THROTTLE_MS = 2000;
         this.resetTimes();
     }
     
-    PicFetcher.prototype.advance = function(delta) {
-        var couldAdvance = this.listView.advance(delta);
-        if (!couldAdvance) {
-            this.getMorePosts(true);
-        }
-    }
     // Debug
     PicFetcher.prototype.debug = function() {
-        this.listView.debug();
     }
     
     PicFetcher.prototype.getImgurLinks = function(item) {
@@ -288,6 +288,19 @@ REDDIT_THROTTLE_MS = 2000;
         
         item.url = "http://i.qkme.me/" + hash + ".jpg";
         this.appendImage(item);
+    }
+
+    PicFetcher.prototype.getYoutubeLink = function(item) {
+    	var videoIdRe = /.*v=([^&]*)/,
+    		videoId = videoIdRe.exec(item.url)[1];
+
+    	if(videoId) {
+	    	var html = '<iframe class="youtube-player" type="text/html" width="640" height="385" '
+	    	  + 'src="http://www.youtube.com/embed/' + videoId + '" frameborder="0"></iframe>';
+	    	this.appendHtml(item, html);
+    	} else {
+    		console.error("Can't parse youtube video!!!", item.url);
+    	}
     }
 
     // Export
