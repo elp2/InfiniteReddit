@@ -1,7 +1,5 @@
 var firstImages = 0;
-$(document).ready(function() {
-    
-    
+$(document).ready(function() {    
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, false);
@@ -11,8 +9,8 @@ $(document).ready(function() {
     span,
     i, 
     page, 
-    slides = [
-    ];
+    slides = []
+    ;
     
     gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
 
@@ -30,11 +28,16 @@ $(document).ready(function() {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         
         var page = $(gallery.masterPages[i]);
-        if (slide.html) {
-            
-        } else {
-            var img = page.find("#gallery-img");
+        var htmlSpan = page.find("#htmlSpan");
+        var img = page.find("#gallery-img");
 
+        if (slide.html) {
+            img.hide();
+            htmlSpan.html("TEST!!!<h1>h1</h1>");
+
+        } else {
+            htmlSpan.html("");
+            img.show();
             img.attr('src', slide.url)
             .attr('className', 'loading')
             .width(slide.width)
@@ -162,11 +165,9 @@ $(document).ready(function() {
             firstImages++;
         }
     }
-    ;
     
     function addHTML(item, html) {
-        var el, 
-        newPageI = gallery.options.numberOfPages;
+        var newPageI = gallery.options.numberOfPages;
         
         gallery.updatePageCount(newPageI + 1);
         slides.push({html: html, item: item});
@@ -186,7 +187,6 @@ $(document).ready(function() {
     function start() {
         picFetcher.getMorePosts()
     }
-
     var startDelay = onlineMode ? 0 : 100;
     setTimeout(start, startDelay);
     

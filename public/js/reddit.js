@@ -6,11 +6,11 @@ String.prototype.beginsWith = function(prefix) {
     return this.indexOf(prefix) == 0;
 };
 
-var turl1 = "test/images/2.png", //"https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
-turl2 = "http://imgur.com/uS5Ka",  //"test/2.png", 
+var turl1 = "https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
+turl2 = "test/images/2.png", 
 turl3 = "test/images/3.jpg", 
-turl4 = "test/images/4.jpg"
-turl5 = "http://imgur.com/a/kinkC"; //"test/5.jpg"
+turl4 = "test/images/4.jpg",
+turl5 = "test/images/5.jpg"
 testingJsonData = {
     "kind": "Listing","data": {"modhash": "","children": [
             {"kind": "t3","data": {"domain": "imgur.com","banned_by": null,"media_embed": {},"subreddit": "pics","selftext_html": null,"selftext": "","likes": null,"link_flair_text": null,"id": "yzys5","clicked": false,"title": "Found a strawBEARy!","num_comments": 277,"score": 2141,"approved_by": null,"over_18": false,"hidden": false,"thumbnail": "http://f.thumbs.redditmedia.com/HNzAVvyLCx8ZidvG.jpg","subreddit_id": "t5_2qh0u","edited": false,"link_flair_css_class": null,"author_flair_css_class": null,"downs": 6498,"saved": false,"is_self": false,"permalink": "/r/pics/comments/yzys5/found_a_strawbeary/","name": "t3_yzys5","created": 1346233214.0,"url": turl1,"author_flair_text": null,"author": "Taybow","created_utc": 1346208014.0,"media": null,"num_reports": null,"ups": 8639}}, 
@@ -275,6 +275,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
             });        
         }
     }
+    
     PicFetcher.prototype.getQuickMemeLink = function(item) {
         var split = item.url.split("/");
         var hash = split[split.length - 1];

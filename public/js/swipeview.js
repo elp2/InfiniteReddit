@@ -334,9 +334,7 @@ var SwipeView = (function (window, document) {
 			}
 
 			// We are scrolling vertically, so skip SwipeView and give the control back to the browser
-			console.log("tdl: ", this.directionLocked,  this.stepsY > this.stepsX )
 			if (!this.directionLocked && this.stepsY > this.stepsX) {
-				console.log("returning to browser");
 				this.initiated = false;
 				return;
 			}
