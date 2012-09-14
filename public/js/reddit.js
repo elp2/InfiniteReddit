@@ -34,7 +34,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
     function PicFetcher(options) {
         options = options || {};
         this.onlineMode = !!options.onlineMode;
-        this.imgFn = options.imgFn; // TODO: get properly
+        this.imgFn = options.imgFn; 
         this.htmlFn = options.htmlFn;
         
         this.canRequestAt = (new Date()).getTime();
@@ -43,7 +43,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         
         if (this.onlineMode) {
             this.seenURLs = {};
-        // TODO: TESTING getSeenURLs();
+        // TODO: Remove! TESTING getSeenURLs();
         } else {
             localStorage.clear();
             this.seenURLs = {};
