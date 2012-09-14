@@ -6,7 +6,7 @@ String.prototype.beginsWith = function(prefix) {
     return this.indexOf(prefix) == 0;
 };
 
-var turl1 = "https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
+var turl1 = "test/images/2.png", //"https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
 turl2 = "http://imgur.com/uS5Ka",  //"test/2.png", 
 turl3 = "test/images/3.jpg", 
 turl4 = "test/images/4.jpg"
@@ -25,7 +25,6 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
 
 !function(window) {
     'use strict';
-
 
     // Initial Setup
     // =============
@@ -101,7 +100,6 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         return url;
     }
     
-    
     PicFetcher.prototype._getMorePosts = function() {
         if (this.onlineMode) {
             var url = urlForSubreddits(this.subreddits, this.afterTag);
@@ -172,8 +170,6 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
     // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
     }
     
-
-
     PicFetcher.prototype.appendImage = function(img) {
         if(!this.shouldShowImage(img))
             return;
@@ -202,7 +198,9 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
     }
 
     PicFetcher.prototype.appendHtml = function(item, html) {
+        if(this.seenURLs[item.url]) return;
     	this.seenURLs[item.url] = true;
+        this.htmlFn(item, html);
     }
     
     PicFetcher.prototype.enrichItem = function(data) {
@@ -213,14 +211,14 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
             {prefixes: ["qkme.me", "www.quickmeme.com", "quickmeme.com"],fn: function() {
                     self.getQuickMemeLink(data)
                 }}, 
-            {prefixes: ["youtube.com", "youtu.be"], fn:function(){ self.getYoutubeLink(data)}},
+            {prefixes: ["youtube.com", "www.youtube.com", "youtu.be"], fn:function(){ self.getYoutubeLink(data)}},
         ];
         
         for (var i = matches.length - 1; i >= 0; i--) {
             var m = matches[i];
             for (var j = m.prefixes.length - 1; j >= 0; j--) {
                 var prefix = m.prefixes[j];
-                if (data.url.beginsWith("http://" + prefix)) {
+                if (data.url.beginsWith("http://" + prefix ) || data.url.beginsWith("https://" + prefix)) {
                     m.fn();
                     return;
                 }
@@ -228,7 +226,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
             ;
         }
         ;
-        console.log("Couldn't handle: ", data.url, data);
+        console.log("No enriching rule for: ", data.url, data);
     }
     
     PicFetcher.prototype.handlePosts = function(data) {
@@ -274,8 +272,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
             $.getJSON(url, function(data) {
                 item.url = data.image && data.image.links && data.image.links.original;
                 self.appendImage(item);
-            });
-        
+            });        
         }
     }
     PicFetcher.prototype.getQuickMemeLink = function(item) {

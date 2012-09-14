@@ -8,6 +8,7 @@ $(document).ready(function() {
     
     var gallery, 
     el, 
+    span,
     i, 
     page, 
     slides = [
@@ -35,12 +36,11 @@ $(document).ready(function() {
     }
     
     function putSlideAt(upcoming, i) {
-        var slide = slides[upcoming] ? slides[upcoming] : {url: "",width: 250,height: 250,desc: ""};
+        var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         
         if (slide.html) {
-        
-        } else {
             
+        } else {            
             el = gallery.masterPages[i].querySelector('img');
             var img = $(el);
             img.attr('src', slide.url)
@@ -50,11 +50,12 @@ $(document).ready(function() {
             .data('orig-width', slide.width)
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
-            ;
-            
-            el = gallery.masterPages[i].querySelector('span');
-            el.innerHTML = slide.desc;
+            ;            
         }
+
+        el = gallery.masterPages[i].querySelector('span');
+        el.innerHTML = slide.item.title;
+        console.log(slides);
     }
     
     gallery.onFlip(function() {
@@ -162,7 +163,7 @@ $(document).ready(function() {
         newPageI = gallery.options.numberOfPages;
         
         gallery.updatePageCount(newPageI + 1);
-        slides.push({url: img.url,width: w,height: h,desc: img.title});
+        slides.push({url: img.url, width: w, height: h, item: img});
 
         // Special case to get the first images out there.  
         if (1 == firstImages) {
@@ -180,7 +181,7 @@ $(document).ready(function() {
         newPageI = gallery.options.numberOfPages;
         
         gallery.updatePageCount(newPageI + 1);
-        slides.push({html: html,desc: img.title});
+        slides.push({html: html, item: item});
         if (1 == firstImages) {
             putSlideAt(1, 2);
             firstImages++;
@@ -188,17 +189,16 @@ $(document).ready(function() {
             putSlideAt(0, 1);
             firstImages++;
         }
-    
     }
     
     var onlineMode = window.location.toString().split("#")[1] != "test";
-    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode,imgFn: addImage,htmlFn: addHTML})
+    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, imgFn: addImage, htmlFn: addHTML})
     picFetcher.setSubreddits(getSubreddits());
     
     function start() {
         picFetcher.getMorePosts()
     }
-    ;
+
     var startDelay = onlineMode ? 0 : 100;
     setTimeout(start, startDelay);
     
