@@ -72,12 +72,10 @@ $(document).ready(function() {
     });
     
     gallery.onMoveOut(function() {
-        console.log("onMoveOut");
         gallery.masterPages[gallery.currentMasterPage].className = gallery.masterPages[gallery.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
     });
     
     gallery.onMoveIn(function() {
-        console.log("onMoveIn");
         var className = gallery.masterPages[gallery.currentMasterPage].className;
         /(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
     });
@@ -213,7 +211,6 @@ $(document).ready(function() {
 
     // TODO: Link this to a settings image.  Prevent normal CB's from happening from keypresses
     var configHtml = _.template($('#settings-modal').html())();
-    console.log(configHtml);
     $('#wrapper').avgrund({
         height: 400,
         holderClass: 'custom',
