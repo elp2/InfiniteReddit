@@ -18,7 +18,7 @@ $(document).ready(function() {
     for (i = 0; i < 3; i++) {
         page = i == 0 ? slides.length - 1 : i - 1;
 
-        el = $(_.template($('#gallery-page').html())());
+        el = $($('#gallery-page').html());
         $(gallery.masterPages[i]).append(el);
 
         el.find("#gallery-img").load(function() {this.className='';}); 
@@ -28,7 +28,7 @@ $(document).ready(function() {
     function setDetails(details, item) {
         details.html(_.template(detailsTemplate, item, {variable:"item"}));
     }
-    
+
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         
