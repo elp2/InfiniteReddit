@@ -147,37 +147,26 @@ $(document).ready(function() {
         }
     });
     
-    
-    
-    function addImage(img, w, h, advanceToNext) {
-        var el, 
-        newPageI = gallery.options.numberOfPages;
-        
-        gallery.updatePageCount(newPageI + 1);
-        slides.push({url: img.url, width: w, height: h, item: img});
-
-        // Special case to get the first images out there.  
-        if (1 == firstImages) {
-            putSlideAt(1, 2);
-            firstImages++;
-        } else if (0 == firstImages) {
-            putSlideAt(0, 1);
-            firstImages++;
-        }
-    }
-    
-    function addHTML(item, html) {
+    function addSlide(slide) {
         var newPageI = gallery.options.numberOfPages;
         
         gallery.updatePageCount(newPageI + 1);
-        slides.push({html: html, item: item});
+        slides.push(slide);
         if (1 == firstImages) {
             putSlideAt(1, 2);
             firstImages++;
         } else if (0 == firstImages) {
             putSlideAt(0, 1);
             firstImages++;
-        }
+        }        
+    }
+    
+    function addImage(img, w, h, advanceToNext) {
+        addSlide({url: img.url, width: w, height: h, item: img});
+    }
+    
+    function addHTML(item, html) {
+        addSlide({html: html, item: item});
     }
     
     var onlineMode = window.location.toString().split("#")[1] != "test";
