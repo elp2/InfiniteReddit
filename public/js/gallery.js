@@ -1,4 +1,3 @@
-var firstImages = 0;
 $(document).ready(function() {    
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
@@ -9,6 +8,7 @@ $(document).ready(function() {
     span,
     i, 
     page, 
+    loadingSlide = {html: $("#loading-slide").html(), loading: true, item: {}},
     slides = []
     ;
     
@@ -23,6 +23,7 @@ $(document).ready(function() {
 
         el.find("#gallery-img").load(function() {this.className='';}); 
     }
+    addSlide(loadingSlide);
     
     var detailsTemplate = $('#details-template').html();
     function setDetails(details, item) {
@@ -32,16 +33,20 @@ $(document).ready(function() {
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         
-        var page = $(gallery.masterPages[i]);
-        var htmlSpan = page.find("#htmlSpan");
-        var img = page.find("#gallery-img");
+        var page = $(gallery.masterPages[i]),
+            htmlSpan = page.find("#htmlSpan"),
+            img = page.find("#gallery-img"),
+            details = page.find("#details");
 
         if (slide.html) {
             img.hide();
+            
             htmlSpan.show();
             htmlSpan.html(slide.html);
         } else {
             htmlSpan.hide();
+            htmlSpan.html("");
+
             img.show();
             img.attr('src', slide.url)
             .attr('className', 'loading')
@@ -51,11 +56,11 @@ $(document).ready(function() {
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;          
-
-            picFetcher.setSeenURL(img.url);  
         }
-
-        setDetails(page.find("#details"), slide.item);
+        if(slide.loading) {
+            details.html("Loading");
+        } else
+            setDetails(details , slide.item);
     }
     
     gallery.onFlip(function() {
@@ -81,6 +86,7 @@ $(document).ready(function() {
         /(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
     });
     var respondToKeys = true;
+
     $(document).keydown(function(event) {
         if (!respondToKeys)
             return;
@@ -99,9 +105,11 @@ $(document).ready(function() {
         function advanceImg() {
             resetImageSize();
             picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
-            if (!gallery.next()) {
-            // TODO: Show some kind of loading screen... maybe let it advance 1 and then replace it as the image comes in
-            }
+
+            if(slides[slides.length-1]!=loadingSlide) {
+                addSlide(loadingSlide);
+            }            
+            gallery.next();
         }
         var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
         switch (event.which) {
@@ -155,16 +163,18 @@ $(document).ready(function() {
     
     function addSlide(slide) {
         var newPageI = gallery.options.numberOfPages;
-        
-        gallery.updatePageCount(newPageI + 1);
-        slides.push(slide);
-        if (1 == firstImages) {
-            putSlideAt(1, 2);
-            firstImages++;
-        } else if (0 == firstImages) {
-            putSlideAt(0, 1);
-            firstImages++;
-        }        
+        if(loadingSlide === slides[newPageI-1]) {
+            slides[newPageI-1] = slide; // Loading Slide replaced with the new slide
+        } else {
+            gallery.updatePageCount(newPageI + 1);
+            slides.push(slide);
+        }
+
+        if(slides.length<=2) {
+            var upcomingSlide = slides.length-1;
+            var galleryPage = slides.length;
+            putSlideAt(upcomingSlide,galleryPage);
+        }
     }
 
     function fitToWindow(img, forceShrink) {
@@ -181,10 +191,14 @@ $(document).ready(function() {
             scaledHeight = maxHeight;
         }
 
-        console.debug("sw:", scaledWidth, "sh", scaledHeight);
         return({width:scaledWidth, height:scaledHeight});
     }
-    function imgFn(item, img)
+
+    function addHtml(item, html) {
+        addSlide({html: html, item: item});
+    }
+
+    function addImg(item, img)
     {
         var fittedSize = fitToWindow(img);
         addSlide({url: item.url, width: fittedSize.width, height: fittedSize.height, item: item});
@@ -192,10 +206,8 @@ $(document).ready(function() {
 
     var onlineMode = window.location.toString().split("#")[1] != "test";
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
-                                        imgFn: imgFn,
-                                        htmlFn: function (item, html) {
-                                                    addSlide({html: html, item: item});
-                                        },
+                                        imgFn: addImg,
+                                        htmlFn: addHtml
                                         });
     picFetcher.setSubreddits(getSubreddits());
     

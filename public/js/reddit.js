@@ -22,6 +22,8 @@ testingJsonData = {
         ],"after": "t3_yyv33","before": null}};
 
 REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
+TESTING_LOAD_DELAY_MS = 2000;
+// TODO: Fix Loading Page for slow connections
 
 !function(window) {
     'use strict';
@@ -96,20 +98,31 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         return url;
     }
     
+    var cumDelay=0;
+    function testLoads(self, child) {
+                    var 
+                        here = {data:{after:testingJsonData.data.after, children:[child]}},
+                        delayMs = cumDelay = cumDelay + TESTING_LOAD_DELAY_MS;
+                    setTimeout(function() {self.handlePosts(here)}, delayMs);
+                }
+
     PicFetcher.prototype._getMorePosts = function() {
+        var self = this;
+
         if (this.onlineMode) {
             var url = urlForSubreddits(this.subreddits, this.afterTag);
-            var self = this;
             $.getJSON(url, function(data) {
                 self.handlePosts(data);
             })
             .error(function() { alert("TODO: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
         } else {
-            this.handlePosts(testingJsonData);
             this.afterTag = "";
+            for (var i = testingJsonData.data.children.length - 1; i >= 0; i--) {
+                var child = child = testingJsonData.data.children[i];
+                testLoads(self, child);
+            }
         }
     }
-
 
     // ---- Getting Images
     function isImageFile(url) {
@@ -127,7 +140,7 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         if (undefined == item || !item.url)
             return false;
         
-        if (this.seenURLs[item.url]) {
+        if (this.haveSeenURL(item.url)) {
             return false;
         }
         
@@ -142,6 +155,17 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         return true;
     }
     
+    PicFetcher.prototype.setSeenURL = function(url) {
+        this.seenURLs[url] = true;
+        var accessedAt = {"@": (new Date).getTime()};
+        localStorage[url] = JSON.stringify(accessedAt);
+    // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
+    }
+
+    PicFetcher.prototype.haveSeenURL = function(url) {
+        return(true==this.seenURLs[url]);
+    }
+
     function getSeenURLs() {
         var seenURLs = {};
         
@@ -158,19 +182,10 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
         
         return (seenURLs);
     }
-    
-    PicFetcher.prototype.setSeenURL = function(url) {
-        this.seenURLs[url] = true;
-        var accessedAt = {"@": (new Date).getTime()};
-        localStorage[url] = JSON.stringify(accessedAt);
-    // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
-    }
-    
+        
     PicFetcher.prototype.appendImage = function(item) {
         if(!this.shouldShowImage(item))
             return;
-        
-        this.seenURLs[item.url] = true;
         var self = this;
        	// Insert preloaded image after it finishes loading via "load" callback
         $('<img />')
@@ -181,16 +196,19 @@ REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
             img.width(this.width);
 
             self.imgFn(item, img);
+            self.setSeenURL(item.url);
         });
     }
 
     PicFetcher.prototype.appendHtml = function(item, html) {
-        if(this.seenURLs[item.url]) return;
-    	this.seenURLs[item.url] = true;
         this.htmlFn(item, html);
     }
     
     PicFetcher.prototype.enrichItem = function(data) {
+        if(this.haveSeenURL(data.url)) 
+            return;
+        this.setSeenURL(data.url);
+
         var self = this;
         var matches = [{prefixes: ["imgur.com"],fn: function() {
                     self.getImgurLinks(data)
