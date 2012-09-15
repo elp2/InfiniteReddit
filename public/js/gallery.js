@@ -103,6 +103,7 @@ $(document).ready(function() {
         
         var img = $(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img"); 
         function advanceImg() {
+            console.log(slides);
             resetImageSize();
             picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
 
@@ -164,9 +165,11 @@ $(document).ready(function() {
     function addSlide(slide) {
         var newPageI = gallery.options.numberOfPages;
         if(loadingSlide === slides[newPageI-1]) {
+            slide.item.title = newPageI + ": " + slide.item.title;
             slides[newPageI-1] = slide; // Loading Slide replaced with the new slide
         } else {
             gallery.updatePageCount(newPageI + 1);
+            slide.item.title = newPageI + ": " + slide.item.title;
             slides.push(slide);
         }
 
@@ -225,6 +228,7 @@ $(document).ready(function() {
     }
 
     // TODO: Tie into actual settings
+    /*
     var configHtml = _.template($('#settings-modal').html())();
     $('#wrapper').avgrund({
         height: 400,
@@ -241,5 +245,6 @@ $(document).ready(function() {
             respondToKeys = true
         },
     });
+    */
 // end document ready
 });

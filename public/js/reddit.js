@@ -22,7 +22,7 @@ testingJsonData = {
         ],"after": "t3_yyv33","before": null}};
 
 REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
-TESTING_LOAD_DELAY_MS = 2000;
+TESTING_LOAD_DELAY_MS = 1000;
 // TODO: Fix Loading Page for slow connections
 
 !function(window) {

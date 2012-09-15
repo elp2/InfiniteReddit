@@ -391,7 +391,7 @@ var SwipeView = (function (window, document) {
 			var pageFlip,
 				pageFlipIndex,
 				className;
-
+			console.debug("tcmp", this.currentMasterPage);
 			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
 
 			// Flip the page
@@ -415,6 +415,7 @@ var SwipeView = (function (window, document) {
 				this.masterPages[pageFlip].style.left = this.page * 100 + 100 + '%';
 
 				pageFlipIndex = this.page + 1;
+				console.debug("else pageFlipIndex=", pageFlipIndex, "cmp=", this.currentMasterPage, "")
 			}
 
 			// Add active class to current page
@@ -435,6 +436,8 @@ var SwipeView = (function (window, document) {
 			// Hide the next page if we decided to disable looping
 			if (!this.options.loop) {
 				this.masterPages[pageFlip].style.visibility = newX === 0 || newX == this.maxX ? 'hidden' : '';
+				if(this.masterPages[pageFlip].style.visibility!='')
+					console.debug("HIDING:", pageFlip, "newX=", newX, "maxX=", this.maxX );
 			}
 
 			if (this.x == newX) {
