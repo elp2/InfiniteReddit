@@ -65,14 +65,12 @@ $(document).ready(function() {
     
     gallery.onFlip(function() {
         var el, 
-        upcoming, 
+        slideIdx, 
         i;
-        
         for (i = 0; i < 3; i++) {
-            upcoming = gallery.masterPages[i].dataset.upcomingPageIndex;
-            
-            if (upcoming != gallery.masterPages[i].dataset.pageIndex) {
-                putSlideAt(upcoming, i);
+            slideIdx = gallery.masterPages[i].dataset.upcomingPageIndex;
+            if (slideIdx != gallery.masterPages[i].dataset.pageIndex) {
+                putSlideAt(slideIdx, i);
             }
         }
     });
@@ -103,7 +101,6 @@ $(document).ready(function() {
         
         var img = $(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img"); 
         function advanceImg() {
-            console.log(slides);
             resetImageSize();
             picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
 
@@ -163,20 +160,17 @@ $(document).ready(function() {
     });
     
     function addSlide(slide) {
-        var newPageI = gallery.options.numberOfPages;
+        var newPageI = gallery.options.numberOfPages,
+            forceRefresh = slides.length <= 2 ? true : false;
         if(loadingSlide === slides[newPageI-1]) {
-            slide.item.title = newPageI + ": " + slide.item.title;
             slides[newPageI-1] = slide; // Loading Slide replaced with the new slide
+            forceRefreshLast = true;
         } else {
             gallery.updatePageCount(newPageI + 1);
-            slide.item.title = newPageI + ": " + slide.item.title;
             slides.push(slide);
         }
-
-        if(slides.length<=2) {
-            var upcomingSlide = slides.length-1;
-            var galleryPage = slides.length;
-            putSlideAt(upcomingSlide,galleryPage);
+        if(forceRefresh) {
+            putSlideAt(slides.length-1, (slides.length)%3);
         }
     }
 
