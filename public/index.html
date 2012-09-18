@@ -21,7 +21,9 @@
 </head>
 
 <body>
-	<div id="wrapper"></div>	
+	<div id="wrapper"></div>
+	<div id="info-popup"><h1>Loading...</h1><img src='img/spinner.gif'></div>
+	<!-- TODO: Not centered -->
 </body>
 </html>
 
@@ -31,11 +33,6 @@
 [Downvotes(block of DV color)		      ]												@TIME
 -->
 <span id='details-title'><%= item.title %></span> on <span id='details-subreddit'><%= item.subreddit %></span>
-</script>
-
-<script type=text/html id='loading-slide'>
-	<h1>Loading!!</h1>
-	<img src='img/spinner.gif'>
 </script>
 
 <script type=text/html id='gallery-page'>

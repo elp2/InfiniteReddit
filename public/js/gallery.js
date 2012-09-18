@@ -8,8 +8,8 @@ $(document).ready(function() {
     span,
     i, 
     page, 
-    loadingSlide = {html: $("#loading-slide").html(), loading: true, item: {}},
-    slides = []
+    slides = [],
+    advanceOnReddit = false;
     ;
     
     gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
@@ -19,12 +19,13 @@ $(document).ready(function() {
         page = i == 0 ? slides.length - 1 : i - 1;
 
         el = $($('#gallery-page').html());
+        el.find("#htmlSpan").hide();
+        el.find("#gallery-img").hide();
         $(gallery.masterPages[i]).append(el);
 
         el.find("#gallery-img").load(function() {this.className='';}); 
     }
-    addSlide(loadingSlide);
-    
+
     var detailsTemplate = $('#details-template').html();
     function setDetails(details, item) {
         details.html(_.template(detailsTemplate, item, {variable:"item"}));
@@ -56,11 +57,8 @@ $(document).ready(function() {
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;          
-        }
-        if(slide.loading) {
-            details.html("Loading");
-        } else
-            setDetails(details , slide.item);
+        } 
+        setDetails(details, slide.item);
     }
     
     gallery.onFlip(function() {
@@ -85,30 +83,36 @@ $(document).ready(function() {
     });
     var respondToKeys = true;
 
+
+    function getCurrentImage() { return($(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img")); }
+
+    function resetImageSize(img) {
+        img.width(img.data('orig-width'));
+        img.height(img.data('orig-height'));
+        var origTop = img.data('orig-top');
+        if (null != origTop) {
+            img.offset({top: origTop});
+            img.data('orig-top', null);
+        }
+    }
+
+    function advanceImg() {
+        resetImageSize(getCurrentImage());
+        picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
+
+        if(!gallery.next()){
+            advanceOnReddit = true;
+            $("#info-popup").show();
+        }
+    }
+
+
     $(document).keydown(function(event) {
         if (!respondToKeys)
             return;
         
-        function resetImageSize() {
-            img.width(img.data('orig-width'));
-            img.height(img.data('orig-height'));
-            var origTop = img.data('orig-top');
-            if (null != origTop) {
-                img.offset({top: origTop});
-                img.data('orig-top', null);
-            }
-        }
-        
-        var img = $(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img"); 
-        function advanceImg() {
-            resetImageSize();
-            picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
+        var img = getCurrentImage();
 
-            if(slides[slides.length-1]!=loadingSlide) {
-                addSlide(loadingSlide);
-            }            
-            gallery.next();
-        }
         var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
         switch (event.which) {
             case jCode:
@@ -118,7 +122,7 @@ $(document).ready(function() {
             
             case kCode:
             case sCode:
-                resetImageSize();
+                resetImageSize(img);
                 gallery.prev();
                 break;
             
@@ -160,17 +164,19 @@ $(document).ready(function() {
     });
     
     function addSlide(slide) {
+        $("#info-popup").hide();
+
         var newPageI = gallery.options.numberOfPages,
             forceRefresh = slides.length <= 2 ? true : false;
-        if(loadingSlide === slides[newPageI-1]) {
-            slides[newPageI-1] = slide; // Loading Slide replaced with the new slide
-            forceRefreshLast = true;
-        } else {
-            gallery.updatePageCount(newPageI + 1);
-            slides.push(slide);
-        }
-        if(forceRefresh) {
-            putSlideAt(slides.length-1, (slides.length)%3);
+
+        gallery.updatePageCount(newPageI + 1);
+        slides.push(slide);
+
+        putSlideAt(slides.length-1, (slides.length)%3);
+
+        if(advanceOnReddit) {
+            advanceOnReddit = false;
+            advanceImg();
         }
     }
 
@@ -204,7 +210,7 @@ $(document).ready(function() {
     var onlineMode = window.location.toString().split("#")[1] != "test";
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
                                         imgFn: addImg,
-                                        htmlFn: addHtml
+                                        htmlFn: addHtml,
                                         });
     picFetcher.setSubreddits(getSubreddits());
     

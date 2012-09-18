@@ -198,3 +198,24 @@ body {
 	-o-transform:translate(0,100%) translateZ(0);
 	transform:translate(0,100%) translateZ(0);
 }
+
+
+#info-popup {
+
+  position:absolute;
+  z-index:500;
+  top:200px;
+  width:200px;
+  height:100px;
+  left:50%;
+
+  text-align:center;
+
+  background:rgba(255,0,0,0.80);
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  -ms-border-radius:10px;
+  -o-border-radius:10px;
+  border-radius:10px;
+  
+}
