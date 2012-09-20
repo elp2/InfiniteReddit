@@ -10,6 +10,11 @@ $(document).ready(function() {
     page, 
     slides = [],
     advanceOnReddit = false;
+
+    _.templateSettings = {
+      interpolate : /\{\{(.+?)\}\}/g
+    };
+
     
     gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
 

@@ -97,10 +97,10 @@ body {
 	top:0;
 	left:0;
 	width:100%;
-	padding:20px 0;
 	display:block;
 	background:rgba(0,0,0,0.75);
-	font-size:20px;
+	height: 60px;
+	font-size:10px;
 	text-align:center;
 	text-shadow:0 1px 0 #000;
 	border-top:1px solid rgba(255,255,255,0.2);
@@ -131,6 +131,10 @@ body {
 	-o-transform:translate(0,-100%);
 	-o-transform:translate(0,-100%) translateZ(0);
 	transform:translate(0,-100%) translateZ(0);
+}
+
+#swipeview-slider #details a {
+	color: #FF0000;
 }
 
 #swipeview-slider #htmlSpan {
@@ -216,6 +220,52 @@ body {
   -moz-border-radius:10px;
   -ms-border-radius:10px;
   -o-border-radius:10px;
-  border-radius:10px;
-  
+  border-radius:10px;  
+}
+
+#updown {
+	float: left;
+	height: 100%;
+}
+#scores-block {
+	float: left;
+	height: 60px;
+	width: 60px;
+}
+
+#score-ups { 
+	background:rgba(235,139,96,1); 
+	color:#000;
+	float: left;
+	width: 100%;
+}
+#score-downs {
+
+	background:rgba(148,148,255,1);	
+	color:#000;
+	float: left;
+	width: 100%;
+}
+#score-score {
+	margin-left: 10px;
+	font-size: 1.5em;
+}
+
+#info-block {
+	float: right;
+	width: 140px;
+}
+
+#title-by {
+	float: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#details-title {
+	font-size: 2.5em;
+}
+
+#author, #comments, #time, #subreddit{
+	font-size: 1.5em;
 }

@@ -28,11 +28,30 @@
 </html>
 
 <script type=text/html id="details-template">
-<!-- 
-[Upvotes(block of UV Color)	   Total Score]	TITLE (linked to page)     					on SUBREDDIT(link) by USER(link)
-[Downvotes(block of DV color)		      ]												@TIME
--->
-<span id='details-title'><%= item.title %></span> on <span id='details-subreddit'><%= item.subreddit %></span>
+<!-- TODO: Add proper links -->
+
+<div id='scores-block'>
+	<span id='score-ups'>{{ item.ups }}</span>
+	<br />
+	<strong><span id='score-score'>{{ item.score }}</span></strong>
+	<br />
+	<span id='score-downs'>{{ item.downs }}</span>
+</div>
+
+<div id='title-by'>
+	<span id='details-title'>{{ item.title }}</span>
+	<br />
+	by <span id="author"><a href="http://reddit.com/???">{{ item.author }}</a></span>
+</div>
+
+<div id='info-block'>
+	on <span id='subreddit'><a href="http://???myself???/thatsubredit">{{ item.subreddit }}</a></span>
+	<br />
+	at <span id='time'>{{ item.localTime }}</span>
+	<br />
+	<span id='comments'><a href="http://reddit???this article">{{ item.num_comments }} comments</a></span>
+</div>
+
 </script>
 
 <script type=text/html id='gallery-page'>
@@ -62,6 +81,6 @@
 
 <script type=text/html id='youtube-template'>
 <iframe class="youtube-player" type="text/html" width="640" height="385"
-		src="http://www.youtube.com/embed/<%=videoId%>" frameborder="0">
+		src="http://www.youtube.com/embed/{{videoId}}" frameborder="0">
 </iframe>
 </script>
