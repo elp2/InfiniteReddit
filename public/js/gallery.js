@@ -32,6 +32,7 @@ $(document).ready(function() {
 
     var detailsTemplate = $('#details-template').html();
     function setDetails(details, item) {
+        item.localTimeAgo = moment.unix(item.created_utc).fromNow();
         details.html(_.template(detailsTemplate, item, {variable:"item"}));
     }
 
