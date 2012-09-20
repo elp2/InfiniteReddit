@@ -10,13 +10,12 @@ $(document).ready(function() {
     page, 
     slides = [],
     advanceOnReddit = false;
-    ;
     
     gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
 
     // Load initial data
     for (i = 0; i < 3; i++) {
-        page = i == 0 ? slides.length - 1 : i - 1;
+        page = i === 0 ? slides.length - 1 : i - 1;
 
         el = $($('#gallery-page').html());
         el.find("#htmlSpan").hide();
@@ -90,7 +89,7 @@ $(document).ready(function() {
         img.width(img.data('orig-width'));
         img.height(img.data('orig-height'));
         var origTop = img.data('orig-top');
-        if (null != origTop) {
+        if (null !== origTop) {
             img.offset({top: origTop});
             img.data('orig-top', null);
         }
@@ -127,7 +126,7 @@ $(document).ready(function() {
                 break;
             
             case spaceCode:
-                if (null == img.data('orig-top')) {
+                if (null === img.data('orig-top')) {
                     img.data('orig-top', img.offset().top);
                 }
                 
@@ -149,16 +148,14 @@ $(document).ready(function() {
                     img.width(img.data('orig-width'));
                     img.height(img.data('orig-height'));
                 } else {
-                    if (null != img.data('orig-top')) {
-                        img.offset({top: img.data('orig-top')})
+                    if (null !== img.data('orig-top')) {
+                        img.offset({top: img.data('orig-top')});
                     }
                     var zoomedSize = fitToWindow(img, true);
 
                     img.width(zoomedSize.width);
                     img.height(zoomedSize.height);
                 }
-                break;
-                
                 break;
         }
     });
@@ -172,7 +169,9 @@ $(document).ready(function() {
         gallery.updatePageCount(newPageI + 1);
         slides.push(slide);
 
-        putSlideAt(slides.length-1, (slides.length)%3);
+        if(forceRefresh) {
+            putSlideAt(slides.length-1, (slides.length)%3);
+        }
 
         if(advanceOnReddit) {
             advanceOnReddit = false;
@@ -210,25 +209,25 @@ $(document).ready(function() {
     var onlineMode = window.location.toString().split("#")[1] != "test";
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
                                         imgFn: addImg,
-                                        htmlFn: addHtml,
+                                        htmlFn: addHtml
                                         });
     picFetcher.setSubreddits(getSubreddits());
     
     function start() {
-        picFetcher.getMorePosts()
+        picFetcher.getMorePosts();
     }
     var startDelay = onlineMode ? 0 : 100;
     setTimeout(start, startDelay);
     
     function getSubreddits() {
         var reddits = window.location.toString().split("?")[1];
-        if (undefined == reddits)
-            return (["all"])
-        return (reddits.split("+"))
+        if (undefined === reddits)
+            return (["all"]);
+        return (reddits.split("+"));
     }
 
     // TODO: Tie into actual settings
-    /*
+    
     var configHtml = _.template($('#settings-modal').html())();
     $('#wrapper').avgrund({
         height: 400,
@@ -239,12 +238,12 @@ $(document).ready(function() {
         onBlurContainer: '.container',
         template: configHtml,
         onActivate: function() {
-            respondToKeys = false
+            respondToKeys = false;
         },
         onDeactivate: function() {
-            respondToKeys = true
-        },
+            respondToKeys = true;
+        }
     });
-    */
+    
 // end document ready
 });

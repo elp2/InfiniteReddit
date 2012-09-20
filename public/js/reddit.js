@@ -1,16 +1,19 @@
+/*jshint browser:true, jquery:true, devel:true */
+/*global localStorage: false, _:false, REDDIT_THROTTLE_MS:false, TESTING_LOAD_DELAY_MS:false, testingJsonData: false */
+
 String.prototype.endsWith = function(suffix) {
     return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
 String.prototype.beginsWith = function(prefix) {
-    return this.indexOf(prefix) == 0;
+    return this.indexOf(prefix) === 0;
 };
 
 var turl1 = "https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", //images/pic06.jpg", 
 turl2 = "test/images/2.png", 
 turl3 = "test/images/3.jpg", 
 turl4 = "test/images/4.jpg",
-turl5 = "test/images/5.jpg"
+turl5 = "test/images/5.jpg";
 testingJsonData = {
     "kind": "Listing","data": {"modhash": "","children": [
             {"kind": "t3","data": {"domain": "imgur.com","banned_by": null,"media_embed": {},"subreddit": "pics","selftext_html": null,"selftext": "","likes": null,"link_flair_text": null,"id": "yzys5","clicked": false,"title": "1Found a strawBEARy!","num_comments": 277,"score": 2141,"approved_by": null,"over_18": false,"hidden": false,"thumbnail": "http://f.thumbs.redditmedia.com/HNzAVvyLCx8ZidvG.jpg","subreddit_id": "t5_2qh0u","edited": false,"link_flair_css_class": null,"author_flair_css_class": null,"downs": 6498,"saved": false,"is_self": false,"permalink": "/r/pics/comments/yzys5/found_a_strawbeary/","name": "t3_yzys5","created": 1346233214.0,"url": turl1,"author_flair_text": null,"author": "Taybow","created_utc": 1346208014.0,"media": null,"num_reports": null,"ups": 8639}}, 
@@ -22,15 +25,14 @@ testingJsonData = {
         ],"after": "t3_yyv33","before": null}};
 
 REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
-TESTING_LOAD_DELAY_MS = 2000;
-// TODO: Fix Loading Page for slow connections
+TESTING_LOAD_DELAY_MS = 2;
 
 !function(window) {
     'use strict';
 
     // Initial Setup
     // =============
-    var reddit = window.reddit = {}
+    var reddit = window.reddit = {};
 
     // Packaging:
     function PicFetcher(options) {
@@ -54,20 +56,20 @@ TESTING_LOAD_DELAY_MS = 2000;
     PicFetcher.prototype.setSubreddits = function(subreddits) {
         this.subreddits = subreddits;
         this.afterTag = "";
-    }
+    };
 
     // Getting Posts
     
     PicFetcher.prototype.resetTimes = function() {
         this.canRequestAt = (new Date()).getTime() + REDDIT_THROTTLE_MS;
         this.waitingForResponse = false;
-    }
+    };
     
     PicFetcher.prototype.getThrottleTime = function() {
         var now = (new Date()).getTime();
         var throttleTime = this.canRequestAt < now ? 0 : this.canRequestAt - now;
         return (throttleTime);
-    }
+    };
     
     PicFetcher.prototype.getMorePosts = function() {
         if (this.waitingForResponse) {
@@ -78,32 +80,30 @@ TESTING_LOAD_DELAY_MS = 2000;
         var throttleTime = this.getThrottleTime();
         var self = this;
         setTimeout(function() {
-            self._getMorePosts()
+            self._getMorePosts();
         }, throttleTime);
-    }
+    };
     
     function urlForSubreddits(subreddits, after) {
-        // http://www.reddit.com/r/starcraft/.json?jsonp=?&after=t3_yjbu1
-        var redditsURLBase = "http://www.reddit.com/r/"
-        var redditURLJsonEnding = "/.json?jsonp=?"
+        var redditsURLBase = "http://www.reddit.com/r/";
+        var redditURLJsonEnding = "/.json?jsonp=?";
         
-        var url = redditsURLBase
-        url = url + subreddits.join("+")
-        url = url + redditURLJsonEnding
-        if (after.length > 0)
-            url = url + "&after=" + after
-        
-        console.log("Getting URL=", url)
+        var url = redditsURLBase;
+        url = url + subreddits.join("+");
+        url = url + redditURLJsonEnding;
+        if (after.length > 0) {
+            url = url + "&after=" + after;
+        }
+        console.log("Getting URL=", url);
         
         return url;
     }
     
     var cumDelay=0;
     function testLoads(self, child) {
-                    var 
-                        here = {data:{after:testingJsonData.data.after, children:[child]}},
-                        delayMs = cumDelay = cumDelay + TESTING_LOAD_DELAY_MS;
-                    setTimeout(function() {self.handlePosts(here)}, delayMs);
+                    cumDelay += TESTING_LOAD_DELAY_MS;
+                    var here = {data:{after:testingJsonData.data.after, children:[child]}};
+                    setTimeout(function() {self.handlePosts(here);}, cumDelay);
                 }
 
     PicFetcher.prototype._getMorePosts = function() {
@@ -118,11 +118,11 @@ TESTING_LOAD_DELAY_MS = 2000;
         } else {
             this.afterTag = "";
             for (var i = testingJsonData.data.children.length - 1; i >= 0; i--) {
-                var child = child = testingJsonData.data.children[i];
+                var child = testingJsonData.data.children[i];
                 testLoads(self, child);
             }
         }
-    }
+    };
 
     // ---- Getting Images
     function isImageFile(url) {
@@ -137,41 +137,41 @@ TESTING_LOAD_DELAY_MS = 2000;
     }
     
     PicFetcher.prototype.shouldShowImage = function(item) {
-        if (undefined == item || !item.url)
+        if (undefined === item || !item.url)
             return false;
         
         if (this.haveSeenURL(item.url)) {
             return false;
         }
         
-        if (true == item.over_18) {
+        if (true === item.over_18) {
             return false;
         }
         
         if (!isImageFile(item.url)) {
-            console.log(item.url, ": is not an image", item)
+            console.log(item.url, ": is not an image", item);
             return false;
         }
         return true;
-    }
+    };
     
     PicFetcher.prototype.setSeenURL = function(url) {
         this.seenURLs[url] = true;
         var accessedAt = {"@": (new Date).getTime()};
         localStorage[url] = JSON.stringify(accessedAt);
     // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
-    }
+    };
 
     PicFetcher.prototype.haveSeenURL = function(url) {
-        return(true==this.seenURLs[url]);
-    }
+        return(true===this.seenURLs[url]);
+    };
 
     function getSeenURLs() {
         var seenURLs = {};
         
         for (var url in localStorage) {
             var accessedAt = localStorage[url];
-            if (!accessedAt.charAt(0) == "{")
+            if (accessedAt.charAt(0) !== "{")
                 continue; // Had a random cb_cp key which I didn't set and isn't a valid JSON key
             try {
                 seenURLs[url] = JSON.parse(accessedAt);
@@ -202,11 +202,11 @@ TESTING_LOAD_DELAY_MS = 2000;
         .error(function(){
             console.error("Error loading " + item.url);
         });
-    }
+    };
 
     PicFetcher.prototype.appendHtml = function(item, html) {
         this.htmlFn(item, html);
-    }
+    };
     
     PicFetcher.prototype.enrichItem = function(data) {
         if(this.haveSeenURL(data.url)) 
@@ -215,12 +215,12 @@ TESTING_LOAD_DELAY_MS = 2000;
 
         var self = this;
         var matches = [{prefixes: ["imgur.com"],fn: function() {
-                    self.getImgurLinks(data)
+                    self.getImgurLinks(data);
                 }}, 
             {prefixes: ["qkme.me", "www.quickmeme.com", "quickmeme.com"],fn: function() {
-                    self.getQuickMemeLink(data)
+                    self.getQuickMemeLink(data);
                 }}, 
-            {prefixes: ["youtube.com", "www.youtube.com", "youtu.be"], fn:function(){ self.getYoutubeLink(data)}},
+            {prefixes: ["youtube.com", "www.youtube.com", "youtu.be"], fn:function(){ self.getYoutubeLink(data);}}
         ];
         
         for (var i = matches.length - 1; i >= 0; i--) {
@@ -232,11 +232,9 @@ TESTING_LOAD_DELAY_MS = 2000;
                     return;
                 }
             }
-            ;
         }
-        ;
         console.log("No enriching rule for: ", data.url, data);
-    }
+    };
     
     PicFetcher.prototype.handlePosts = function(data) {
         this.afterTag = data.data && data.data.after;
@@ -247,14 +245,14 @@ TESTING_LOAD_DELAY_MS = 2000;
         var self = this;
         $.each(data.data.children, function(i, item) {
         	if (isImageFile(item.data.url)) {
-                self.appendImage(item.data)
+                self.appendImage(item.data);
             } else {
                 self.enrichItem(item.data);
             }
         });
         
         this.resetTimes();
-    }
+    };
         
     PicFetcher.prototype.getImgurLinks = function(item) {
         var self = this;
@@ -279,7 +277,7 @@ TESTING_LOAD_DELAY_MS = 2000;
                 self.appendImage(item);
             });        
         }
-    }
+    };
 
     PicFetcher.prototype.getQuickMemeLink = function(item) {
         var split = item.url.split("/");
@@ -291,20 +289,19 @@ TESTING_LOAD_DELAY_MS = 2000;
         
         item.url = "http://i.qkme.me/" + hash + ".jpg";
         this.appendImage(item);
-    }
+    };
 
     PicFetcher.prototype.getYoutubeLink = function(item) {
     	var videoIdRe = /.*v=([^&]*)/,
     		videoId = videoIdRe.exec(item.url)[1];
 
     	if(videoId) {
-	    	var html = '<iframe class="youtube-player" type="text/html" width="640" height="385" '
-	    	  + 'src="http://www.youtube.com/embed/' + videoId + '" frameborder="0"></iframe>';
+	    	var html = _.template($("#youtube-template").html())({videoId:videoId});
 	    	this.appendHtml(item, html);
     	} else {
     		console.error("Can't parse youtube video!!!", item.url);
     	}
-    }
+    };
 
     // Export
     // ======
