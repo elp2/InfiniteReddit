@@ -96,7 +96,7 @@ TESTING_LOAD_DELAY_MS = 2;
         if (after.length > 0) {
             url = url + "&after=" + after;
         }
-        console.log("Getting URL=", url);
+        reddit.log("Getting URL=", url);
         
         return url;
     }
@@ -151,7 +151,7 @@ TESTING_LOAD_DELAY_MS = 2;
         }
         
         if (!isImageFile(item.url)) {
-            console.log(item.url, ": is not an image", item);
+            reddit.log(item.url, ": is not an image", item);
             return false;
         }
         return true;
@@ -178,7 +178,7 @@ TESTING_LOAD_DELAY_MS = 2;
             try {
                 seenURLs[url] = JSON.parse(accessedAt);
             } catch (e) {
-                console.error("Error deserializing key=", url, "val=", accessedAt, ".\n", e);
+                reddit.error("Error deserializing key=", url, "val=", accessedAt, ".\n", e);
             }
         }
         
@@ -202,7 +202,7 @@ TESTING_LOAD_DELAY_MS = 2;
             self.setSeenURL(item.url);
         })
         .error(function(){
-            console.error("Error loading " + item.url);
+            reddit.error("Error loading " + item.url);
         });
     };
 
@@ -235,13 +235,13 @@ TESTING_LOAD_DELAY_MS = 2;
                 }
             }
         }
-        console.log("No enriching rule for: ", data.url, data);
+        reddit.log("No enriching rule for: ", data.url, data);
     };
     
     PicFetcher.prototype.handlePosts = function(data) {
         this.afterTag = data.data && data.data.after;
         if (!this.afterTag) {
-            console.error("TODO: No after tag.  You've reached the end of reddit!  Bad things will happen!");
+            reddit.error("TODO: No after tag.  You've reached the end of reddit!  Bad things will happen!");
         }
         
         var self = this;
@@ -269,7 +269,6 @@ TESTING_LOAD_DELAY_MS = 2;
                     return;
 
             // TODO: actually add the album along with relevant titles/descriptions
-            //console.log("Not able to support imgur albums yet", images.length, "images not being added");
             });
         } else { // normal image
             var url = "http://api.imgur.com/2/image/" + id + ".json";
@@ -297,11 +296,15 @@ TESTING_LOAD_DELAY_MS = 2;
     	var videoIdRe = /.*v=([^&]*)/,
     		videoId = videoIdRe.exec(item.url)[1];
 
+        reddit.log("testing: ", videoId);
+        reddit.error("testing: ", videoId);
+
+
     	if(videoId) {
 	    	var html = _.template($("#youtube-template").html())({videoId:videoId});
 	    	this.appendHtml(item, html);
     	} else {
-    		console.error("Can't parse youtube video!!!", item.url);
+    		reddit.error("Can't parse youtube video!!!", item.url);
     	}
     };
 
@@ -310,4 +313,17 @@ TESTING_LOAD_DELAY_MS = 2;
 
     // Classes:
     reddit.PicFetcher = PicFetcher;
+    reddit.log = function() {
+        if(typeof console == "undefined") return;
+        var args = jQuery.makeArray(arguments);
+        args.unshift("(reddit)");
+        console.log.apply(console, args);
+    };
+
+    reddit.error = function() {
+        if(typeof console == "undefined") return;
+        var args = jQuery.makeArray(arguments);
+        args.unshift("(reddit)");
+        console.error.apply(console, args);        
+    }
 }(window);

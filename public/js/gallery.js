@@ -236,7 +236,8 @@ $(document).ready(function() {
     
     var configHtml = _.template($('#settings-modal').html())();
     $('#wrapper').avgrund({
-        height: 400,
+        width: 500,
+        height: 500,
         holderClass: 'custom',
         showClose: true,
         showCloseText: 'OK',

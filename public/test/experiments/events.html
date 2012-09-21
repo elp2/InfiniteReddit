@@ -1,8 +1,13 @@
 <html>
-
 <script type="text/javascript" src="../../js/moment.min.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" src="../../js/jquery-1.8.0.js"></script>
+<script type="text/javascript" src="../../js/bootstrap.js"></script>
 
+    <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css">
+
+
+<script type="text/javascript">
+$(document).ready(function() {    
 item = 
 {"domain": "i.imgur.com", 
 "banned_by": null, 
@@ -40,8 +45,68 @@ item =
  "ups": 420 // 
 
  };
+/*
+           // var url = "http://www.reddit.com/reddits/.json";
+           var url = "http://www.reddit.com/r/starcraft.json";
+            $.getJSON(url, function(data) {
+            	console.log(data);
+            })
+            .error(function() { alert("TODO1: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
 
-console.log(item);
+
+
+
+           var url = "http://www.reddit.com/reddits/.json";
+           //var url = "http://www.reddit.com/r/starcraft.json";
+            $.getJSON(url, function(data) {
+            	console.log(data);
+            })
+            .error(function() { alert("TODO2: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
+
+*/
+
+           // var url = "http://www.reddit.com/reddits/.json";
+           console.debug((new Date()));
+           var url = "http://www.reddit.com/reddits/.json?jsonp=?";
+            $.getJSON(url, function(data) {
+            	console.log(data);
+           console.debug((new Date()));
+
+            })
+            .error(function() { alert("TODO3: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
+
+tah = $('.typeahead');
+tah2 = $("#tah");
+var sourcearr = ["1","a", "apple", "aardvark"];
+function f(query, cbFn) {
+	//return(["a","b","aaa"]);
+	cbFn(["a", "a1"])
+}
+$('#tah').typeahead({source:f});
+});
 </script>
+<button type="button" class="btn btn-primary" data-loading-text="Loading...">Loading state</button>
+<form>
+	<input type="text" data-provide="typeahead" id="tah">
+</form>
+
+<!-- Modal -->
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Modal header</h3>
+  </div>
+  <div class="modal-body">
+    <p>One fine body</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+  </div>
+</div>
+
+<!-- Button to trigger modal -->
+<a href="#myModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a>
+ 
 
 </html>

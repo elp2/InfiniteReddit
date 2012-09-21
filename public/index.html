@@ -29,8 +29,6 @@
 </html>
 
 <script type=text/html id="details-template">
-<!-- TODO: Add proper links -->
-
 <div id='scores-block'><!--TODO: Remove the text shadows for the scores -->
 	<span id='score-ups'>{{ item.ups }}</span>
 	<br />
@@ -66,18 +64,48 @@
 
 <script type=text/html id='settings-modal'>
 	<h1>∞.r</h1>
+
 	<h3>Subreddits:</h3>
 	<span id='subreddits-list'>all</span>
+
 	<h3>Instructions</h3>
 	Hands off your mouse! Use the keyboard instead!
-	<ul><li><b>j/a</b> - advance to next</li>
+	<ul>
+		<li><b>j/a</b> - advance to next</li>
 		<li><b>k/s</b> - go back</li>
-		<li><b>d/l</b> - zoom to fit</li>
+		<li><b>d/l</b> - zoom/unzoom to fit</li>
 		<li><b>space</b> - scroll down image, advance to next</li> 
 	</ul>
+
 	<h3>Options</h3>
-	<ul><li>Show Videos</li><li>Auto Zoom Images</li></ul>
-	<p><a href="TODO">About</a></p>
+	<ul>
+		<li>Zoom Images: 
+			<div class="btn-group" data-toggle="buttons-radio">
+				<button type="button" class="btn">Always</button>
+				<button type="button" class="btn">Except very tall</button>
+				<button type="button" class="btn">Max 75%</button>
+				<button type="button" class="btn">Max 50%</button>
+				<button type="button" class="btn">Never</button>
+			</div>
+		</li>
+		<li>Videos: 
+			<div class="btn-group" data-toggle="buttons-radio">
+				<button type="button" class="btn">Autoplay</button>
+				<button type="button" class="btn">Show</button>
+				<button type="button" class="btn">Off</button>
+			</div>
+		</li>
+		<li>NSFW Mode:
+			<div class="btn-group" data-toggle="buttons-radio">
+				<button type="button" class="btn">On</button>
+				<button type="button" class="btn">Off</button>
+			</div>
+		</li>
+	</ul>
+
+	<br />
+	<a href="about.html">About</a>
+	</br>
 </script>
 
 <script type=text/html id='youtube-template'>
