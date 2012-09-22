@@ -47,6 +47,8 @@ TESTING_LOAD_DELAY_MS = 2;
         
         this.canRequestAt = (new Date()).getTime();
         this.waitingForResponse = false;
+        this.items = [];
+        this.itemsIndex = 0;
         
         if (this.onlineMode) {
             this.seenURLs = {};
@@ -68,6 +70,8 @@ TESTING_LOAD_DELAY_MS = 2;
     PicFetcher.prototype.setSubreddits = function(subreddits) {
         this.subreddits = subreddits;
         this.afterTag = "";
+        this.items = [];
+        this.itemsIndex = 0;        
     };
 
     // Getting Posts
@@ -82,7 +86,24 @@ TESTING_LOAD_DELAY_MS = 2;
         var throttleTime = this.canRequestAt < now ? 0 : this.canRequestAt - now;
         return (throttleTime);
     };
+
+    PicFetcher.prototype.shouldFetchMorePosts = function() {
+        return(this.itemsIndex > this.items.length-10);
+    }
+
+    PicFetcher.prototype.advance = function() {
+        if(this.itemsIndex<=this.items.length-1) this.itemsIndex++;
+        if(this.shouldFetchMorePosts()) {
+            reddit.log("getting more!", this.itemsIndex, "/", this.items.length);
+            this.getMorePosts();
+        }
+    }
+
+    PicFetcher.prototype.retreat = function() {
+        if(this.itemsIndex>0) this.itemsIndex--;
+    }
     
+
     PicFetcher.prototype.getMorePosts = function() {
         if (this.waitingForResponse) {
             return; // already have a live request so do nothing
@@ -198,6 +219,7 @@ TESTING_LOAD_DELAY_MS = 2;
 
             self.imgFn(item, img);
             self.setSeenURL(item.url);
+            self.items.push(item);
         })
         .error(function(){
             reddit.error("Error loading " + item.url);
@@ -205,6 +227,7 @@ TESTING_LOAD_DELAY_MS = 2;
     };
 
     PicFetcher.prototype.appendHtml = function(item, html) {
+        this.items.push(item);
         this.htmlFn(item, html);
     };
     

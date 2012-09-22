@@ -105,12 +105,18 @@ $(document).ready(function() {
 
     function advanceImg() {
         resetImageSize(getCurrentImage());
-        picFetcher.getMorePosts(); // TODO: rely on throttling for now.  Find a better way!
+        picFetcher.advance();
 
         if(!gallery.next()){
             advanceOnReddit = true;
             $("#info-popup").show();
         }
+    }
+
+    function retreatImg() {
+        resetImageSize(getCurrentImage());
+        picFetcher.retreat();
+        gallery.prev();
     }
 
 
@@ -129,8 +135,7 @@ $(document).ready(function() {
             
             case kCode:
             case sCode:
-                resetImageSize(img);
-                gallery.prev();
+                retreatImg();
                 break;
             
             case spaceCode:
