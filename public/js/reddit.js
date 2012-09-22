@@ -51,10 +51,7 @@ IMAGES_BUFFER_LENGTH = 10;
         this.items = [];
         this.itemsIndex = 0;
         
-        if (this.onlineMode) {
-            this.seenURLs = {};
-        // TODO: Remove! TESTING getSeenURLs();
-        } else {
+        if (!this.onlineMode) {
             localStorage.clear();
             this.seenURLs = {};
         }
@@ -69,6 +66,7 @@ IMAGES_BUFFER_LENGTH = 10;
     }
 
     PicFetcher.prototype.setSubreddits = function(subreddits) {
+        reddit.log("Setting subreddits to", subreddits);
         this.subreddits = subreddits;
         this.afterTag = "";
         this.items = [];
@@ -148,7 +146,7 @@ IMAGES_BUFFER_LENGTH = 10;
             $.getJSON(url, function(data) {
                 self.handlePosts(data);
             })
-            .error(function() { alert("TODO: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
+            .error(function() { reddit.error("Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
         } else {
             this.afterTag = "";
             for (var i = testingJsonData.data.children.length - 1; i >= 0; i--) {
@@ -156,6 +154,13 @@ IMAGES_BUFFER_LENGTH = 10;
                 testLoads(self, child);
             }
         }
+
+        // Attempt to get more in a bit in case we haven't loaded enough
+        setTimeout(function() {
+            if(self.shouldFetchMorePosts()) {
+                self.getMorePosts();
+            }
+        }, REDDIT_THROTTLE_MS*2);
     };
 
     // ---- Getting Images

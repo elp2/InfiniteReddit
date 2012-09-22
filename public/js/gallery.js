@@ -169,8 +169,6 @@ $(document).ready(function() {
                 } else {
                     advanceImg();
                 }
-                //TODO: make these more easily pageable by an integer number of times
-                // TODO: advance down the image if it's super tall, advance to next if we're at the bottom / it was already visible
                 break;
             
             case dCode:
@@ -269,7 +267,6 @@ $(document).ready(function() {
 
     function saveSettings() {
         // TODO: Save subreddits and put in hash without refreshing
-
         // TODO: fill in vals
 
         picFetcher.setShow_Videos();

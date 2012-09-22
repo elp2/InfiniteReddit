@@ -72,7 +72,7 @@ var SwipeView = (function (window, document) {
 			// User defined options
 			for (i in options) this.options[i] = options[i];
 
-			// TODO: With this, we can't scroll down.  Without it we start getting scrollbars and it screws up the available div size			
+			// ELP: With this, we can't scroll down.  Without it we start getting scrollbars and it screws up the available div size			
 			this.wrapper.style.overflow = 'hidden'; 
 			this.wrapper.style.position = 'relative';
 			
