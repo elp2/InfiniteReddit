@@ -42,6 +42,8 @@ TESTING_LOAD_DELAY_MS = 2;
         this.onlineMode = !!options.onlineMode;
         this.imgFn = options.imgFn; 
         this.htmlFn = options.htmlFn;
+        this.show_over_18 = !!options.show_over_18;
+        this.show_videos = !!options.show_videos;
         
         this.canRequestAt = (new Date()).getTime();
         this.waitingForResponse = false;
@@ -55,6 +57,14 @@ TESTING_LOAD_DELAY_MS = 2;
         }
     }
     
+    PicFetcher.prototype.setShow_over_18 = function(bool) {
+        this.show_over_18 = bool;
+    }
+
+    PicFetcher.prototype.setShow_Videos = function(bool) {
+        this.show_videos = bool;
+    }
+
     PicFetcher.prototype.setSubreddits = function(subreddits) {
         this.subreddits = subreddits;
         this.afterTag = "";
@@ -145,11 +155,7 @@ TESTING_LOAD_DELAY_MS = 2;
         if (this.haveSeenURL(item.url)) {
             return false;
         }
-        
-        if (true === item.over_18) {
-            return false;
-        }
-        
+                
         if (!isImageFile(item.url)) {
             reddit.log(item.url, ": is not an image", item);
             return false;
@@ -159,27 +165,19 @@ TESTING_LOAD_DELAY_MS = 2;
     
     PicFetcher.prototype.setSeenURL = function(url) {
         this.seenURLs[url] = true;
-        var accessedAt = {"@": (new Date).getTime()};
-        localStorage[url] = JSON.stringify(accessedAt);
+        localStorage[url] = (new Date).getTime() 
     // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
     };
 
     PicFetcher.prototype.haveSeenURL = function(url) {
-        return(true===this.seenURLs[url]);
+        return(undefined!==this.seenURLs[url]);
     };
 
     function getSeenURLs() {
         var seenURLs = {};
         
         for (var url in localStorage) {
-            var accessedAt = localStorage[url];
-            if (accessedAt.charAt(0) !== "{")
-                continue; // Had a random cb_cp key which I didn't set and isn't a valid JSON key
-            try {
-                seenURLs[url] = JSON.parse(accessedAt);
-            } catch (e) {
-                reddit.error("Error deserializing key=", url, "val=", accessedAt, ".\n", e);
-            }
+            seenURLs[url] = localStorage[url];
         }
         
         return (seenURLs);
@@ -246,10 +244,12 @@ TESTING_LOAD_DELAY_MS = 2;
         
         var self = this;
         $.each(data.data.children, function(i, item) {
-        	if (isImageFile(item.data.url)) {
-                self.appendImage(item.data);
-            } else {
-                self.enrichItem(item.data);
+            if (!item.data.over_18 || this.show_over_18) {
+            	if (isImageFile(item.data.url)) {
+                    self.appendImage(item.data);
+                } else {
+                    self.enrichItem(item.data);
+                }
             }
         });
         
@@ -293,6 +293,9 @@ TESTING_LOAD_DELAY_MS = 2;
     };
 
     PicFetcher.prototype.getYoutubeLink = function(item) {
+        if(!this.show_videos)
+            return;
+
     	var videoIdRe = /.*v=([^&]*)/,
     		videoId = videoIdRe.exec(item.url)[1];
 

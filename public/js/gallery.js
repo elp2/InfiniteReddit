@@ -1,3 +1,5 @@
+// TODO: Proper list of defaults
+defaultReddits = [ "all", "Pics", "funny", ];
 $(document).ready(function() {    
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
@@ -212,13 +214,6 @@ $(document).ready(function() {
         addSlide({url: item.url, width: fittedSize.width, height: fittedSize.height, item: item});
     }
 
-    var onlineMode = window.location.toString().split("#")[1] != "test";
-    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
-                                        imgFn: addImg,
-                                        htmlFn: addHtml
-                                        });
-    picFetcher.setSubreddits(getSubreddits());
-    
     function start() {
         picFetcher.getMorePosts();
     }
@@ -226,31 +221,53 @@ $(document).ready(function() {
     setTimeout(start, startDelay);
     
     function getSubreddits() {
-        var reddits = window.location.toString().split("?")[1];
-        if (undefined === reddits)
-            return (["all"]);
-        return (reddits.split("+"));
+        var storedSubreddits = localStorage["storedSubreddits"],
+            reddits,
+            hash;
+        if(storedSubreddits) {
+            reddits = JSON.parse(storedSubreddits);
+            reddit.log("Using storedSubreddits: ", storedSubreddits);
+            if(reddits.length)
+                return(reddits);
+        }
+
+        var hash = window.location.hash;
+        hash = hash.substring(hash.indexOf("#")+1);
+        if(hash.length==0) {
+            return([]);
+        }
+
+        reddits = hash.split("+");
+        return(reddits);
+    }    
+
+    function showSettings() {
+        // TODO: Build up settings HTML
+        // TODO: Show it
     }
 
-    // TODO: Tie into actual settings
-    
-    var configHtml = _.template($('#settings-modal').html())();
-    $('#wrapper').avgrund({
-        width: 500,
-        height: 500,
-        holderClass: 'custom',
-        showClose: true,
-        showCloseText: 'OK',
-        enableStackAnimation: true,
-        onBlurContainer: '.container',
-        template: configHtml,
-        onActivate: function() {
-            respondToKeys = false;
-        },
-        onDeactivate: function() {
-            respondToKeys = true;
-        }
-    });
-    
+    function saveSettings() {
+        // TODO: Save subreddits and put in hash without refreshing
+
+        // TODO: fill in vals
+
+        picFetcher.setShow_Videos();
+        picFetcher.setShow_over_18();
+    }
+
+    // Init Code
+    var onlineMode = window.location.search != "?test";
+    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
+                                        imgFn: addImg,
+                                        htmlFn: addHtml,
+                                        show_over_18: localStorage["show_over_18"],
+                                        show_videos: localStorage["show_videos"]
+                                        });
+    var subReddits = getSubreddits();
+    if(subReddits.length) {
+        picFetcher.setSubreddits(getSubreddits());
+    } else {
+        showSettings();
+    }
 // end document ready
 });
