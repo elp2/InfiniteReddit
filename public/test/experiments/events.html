@@ -45,46 +45,77 @@ item =
  "ups": 420 // 
 
  };
-/*
-           // var url = "http://www.reddit.com/reddits/.json";
-           var url = "http://www.reddit.com/r/starcraft.json";
-            $.getJSON(url, function(data) {
-            	console.log(data);
-            })
-            .error(function() { alert("TODO1: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
-
-
-
-
-           var url = "http://www.reddit.com/reddits/.json";
-           //var url = "http://www.reddit.com/r/starcraft.json";
-            $.getJSON(url, function(data) {
-            	console.log(data);
-            })
-            .error(function() { alert("TODO2: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
-
-*/
 
            // var url = "http://www.reddit.com/reddits/.json";
+           /*
            console.debug((new Date()));
            var url = "http://www.reddit.com/reddits/.json?jsonp=?";
             $.getJSON(url, function(data) {
-            	console.log(data);
-           console.debug((new Date()));
+           // 	console.log(data);
+           //console.debug((new Date()));
 
             })
             .error(function() { alert("TODO3: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
+*/
 
 tah = $('.typeahead');
 tah2 = $("#tah");
-var sourcearr = ["1","a", "apple", "aardvark"];
+var sourcearr = ["Pics", "starcraft", "all", "funny", "fuuuuuu"];
+
 function f(query, cbFn) {
-	//return(["a","b","aaa"]);
-	cbFn(["a", "a1"])
+	var bgh = $("#buttonsGoHere");
+	var completions = [];
+	var alreadySelected = [];
+	for (var i = bgh.children().length - 1; i >= 0; i--) {
+		var child = $(bgh.children()[i]);
+		alreadySelected.push(child.data("subreddit"));
+	}
+
+	var filtered = sourcearr.filter(function(sub){console.log(sub); return( -1 == alreadySelected.indexOf(sub))});
+	cbFn(filtered);
 }
-$('#tah').typeahead({source:f});
+
+$('#tah').typeahead({source:f}).on("change", function(){
+	var val = $(this).val();
+	if(val.lenght<2) return;
+
+	var bgh = $("#buttonsGoHere");
+	if(0==bgh.find(".subreddit-" + val).length)
+	{
+		// TODO: Add a proper "x", make this jQuerified
+		var button = $(	'<button type="button" class="btn subreddit-' + val + '" data-subreddit="' + val + '"' +
+						" onClick='$(this).remove()'>" + val + ' - X</button>'
+		);
+		bgh.append( button );
+	};
+}
+);
+
+params = {"whatever":2}
+var groups = ["#onoff"];
+
+function getParams(params) {
+	for(var group in groups) {
+		group = $(groups[group]);
+		active = group.find(".active");
+		gParams = params[$(group).data("parameter-name")] = active.data("if-selected");
+	}
+}
+
+function setParams(params) {
+	for(var group in groups) {
+		group = $(groups[group]);
+		var searchVal = params[group.data("parameter-name")];
+		console.log(searchVal);
+		$.each(group.children(), function() { if(searchVal==$(this).data("if-selected")) $(this).addClass("active")})
+	}
+}
 });
 </script>
+
+<div id="buttonsGoHere">
+</div>
+
 <button type="button" class="btn btn-primary" data-loading-text="Loading...">Loading state</button>
 <form>
 	<input type="text" data-provide="typeahead" id="tah">
@@ -98,6 +129,12 @@ $('#tah').typeahead({source:f});
   </div>
   <div class="modal-body">
     <p>One fine body</p>
+
+    Show Images: 
+    			<div id="onoff" class="btn-group" data-toggle="buttons-radio" data-parameter-name="whatever">
+				<button type="button" class="btn active" id="eon" data-if-selected=1>On</button>
+				<button type="button" class="btn" id="eoff" data-if-selected=2>Off</button>
+			</div>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -107,6 +144,6 @@ $('#tah').typeahead({source:f});
 
 <!-- Button to trigger modal -->
 <a href="#myModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a>
- 
+ <a href="#" onClick='setParams(params);console.log(params);'>Test</a>
 
 </html>
