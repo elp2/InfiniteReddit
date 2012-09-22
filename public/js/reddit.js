@@ -28,6 +28,7 @@ testingJsonData = {
 
 REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
 TESTING_LOAD_DELAY_MS = 2;
+IMAGES_BUFFER_LENGTH = 10;
 
 !function(window) {
     'use strict';
@@ -71,7 +72,8 @@ TESTING_LOAD_DELAY_MS = 2;
         this.subreddits = subreddits;
         this.afterTag = "";
         this.items = [];
-        this.itemsIndex = 0;        
+        this.itemsIndex = 0;   
+        this.getMorePosts();     
     };
 
     // Getting Posts
@@ -88,7 +90,7 @@ TESTING_LOAD_DELAY_MS = 2;
     };
 
     PicFetcher.prototype.shouldFetchMorePosts = function() {
-        return(this.itemsIndex > this.items.length-10);
+        return(this.itemsIndex > this.items.length - IMAGES_BUFFER_LENGTH);
     }
 
     PicFetcher.prototype.advance = function() {
@@ -103,7 +105,6 @@ TESTING_LOAD_DELAY_MS = 2;
         if(this.itemsIndex>0) this.itemsIndex--;
     }
     
-
     PicFetcher.prototype.getMorePosts = function() {
         if (this.waitingForResponse) {
             return; // already have a live request so do nothing

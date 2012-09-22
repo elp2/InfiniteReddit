@@ -32,6 +32,25 @@ $(document).ready(function() {
         el.find("#gallery-img").load(function() {this.className='';}); 
     }
 
+    var onlineMode = window.location.search != "?test";
+    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
+                                        imgFn: addImg,
+                                        htmlFn: addHtml,
+                                        show_over_18: localStorage["show_over_18"],
+                                        show_videos: localStorage["show_videos"]
+                                        });
+
+    function start() {
+        var subReddits = getSubreddits();
+        if(subReddits.length) {
+            picFetcher.setSubreddits(subReddits);
+        } else {
+            showSettings();
+        }
+    }
+    var startDelay = onlineMode ? 0 : 100;
+    setTimeout(start, startDelay);
+
     var detailsTemplate = $('#details-template').html();
     function setDetails(details, item) {
         item.localTimeAgo = moment.unix(item.created_utc).fromNow();
@@ -219,12 +238,6 @@ $(document).ready(function() {
         addSlide({url: item.url, width: fittedSize.width, height: fittedSize.height, item: item});
     }
 
-    function start() {
-        picFetcher.getMorePosts();
-    }
-    var startDelay = onlineMode ? 0 : 100;
-    setTimeout(start, startDelay);
-    
     function getSubreddits() {
         var storedSubreddits = localStorage["storedSubreddits"],
             reddits,
@@ -237,6 +250,9 @@ $(document).ready(function() {
         }
 
         var hash = window.location.hash;
+        if(undefined==hash){
+            return([]);
+        }
         hash = hash.substring(hash.indexOf("#")+1);
         if(hash.length==0) {
             return([]);
@@ -258,21 +274,6 @@ $(document).ready(function() {
 
         picFetcher.setShow_Videos();
         picFetcher.setShow_over_18();
-    }
-
-    // Init Code
-    var onlineMode = window.location.search != "?test";
-    picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
-                                        imgFn: addImg,
-                                        htmlFn: addHtml,
-                                        show_over_18: localStorage["show_over_18"],
-                                        show_videos: localStorage["show_videos"]
-                                        });
-    var subReddits = getSubreddits();
-    if(subReddits.length) {
-        picFetcher.setSubreddits(getSubreddits());
-    } else {
-        showSettings();
     }
 // end document ready
 });
