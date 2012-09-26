@@ -9,47 +9,115 @@
 
 	<title>∞.r</title>
 
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
 	<link href="css/style.css" rel="stylesheet" type="text/css">
-    <link href="css/avgrund.css" rel="stylesheet" type="text/css">
+
 
 	<script src="js/swipeview.js" type="text/javascript"></script>
 	<script src="js/jquery-1.8.0.js" type="text/javascript"></script>
     <script src="js/reddit.js" type="text/javascript"></script>
-	<script src="js/jquery.avgrund.js" type="text/javascript"></script>
 	<script src="js/gallery.js", type="text/javascript"></script>
 	<script src="js/underscore.js" type="text/javascript" ></script>
 	<script src="js/moment.min.js" type="text/javascript"></script>
+	<script src="js/bootstrap.js" type="text/javascript"></script>
 </head>
 
 <body>
 	<div id="wrapper"></div>
 	<div id="info-popup"><h1>Loading...</h1><img src='img/spinner.gif'></div>
+
+<div id="settingsModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Infinite Reddit</h3>
+  </div>
+  <div class="modal-body">
+	<h4>Hands off your mouse! Use the keyboard instead!</h4>
+	<h4>Keys</h4>
+	<table>
+		<tr>
+			<td><b>j/a</b></td><td>advance</td>
+			<td><b>k/s</b></td><td>go back</td> 
+		</tr>
+		<tr>
+			<td><b>d/l</b></td><td>zoom/unzoom to fit</td>
+			<td><b>space</b></td><td>scroll down image, advance to next</td>
+		</tr>
+	</table>
+
+	<h4>Subreddits</h4>
+	<form>
+		<div id="buttonsGoHere"></div>
+
+		<input type="text" data-provide="typeahead" id="subredditsTypeahead" placeholder="Enter Subreddits">
+		<button type="button" class="btn btn-small">Reset to defaults</button><!-- TODO: reset to defaults -->
+		<button type="button" class="btn btn=small" onClick="$.each( $('#buttonsGoHere').children(), function() {$(this).remove()} );">Clear</button>
+	</form>
+
+	<h4>Options</h4>
+	<table><!--
+		<tr>
+			<td>
+				Zoom Images:
+			</td>
+			<td>
+				<div class="btn-group" data-toggle="buttons-radio" id="zoom-params">
+					<button type="button" class="btn btn-mini" id="always" data-ifset="always">Always</button>
+					<button type="button" class="btn btn-mini" id="exceptVeryTall" data-ifset="exceptVeryTall">Except very tall</button>
+					<button type="button" class="btn btn-mini" id="max75" data-ifset="max75">Max 75%</button>
+					<button type="button" class="btn btn-mini" id="max50" data-ifset="max50">Max 50%</button>
+					<button type="button" class="btn btn-mini" id="never" data-ifset="never">Never</button>
+				</div>
+			</td>
+		</tr>-->
+		<tr>
+			<td>
+				Videos:
+			</td>
+			<td> 
+				<div class="btn-group" data-toggle="buttons-radio" id="video-params">
+<!--					<button type="button" class="btn btn-mini" id="autoplay" data-ifset="autoplay">Autoplay</button>-->
+					<button type="button" class="btn btn-mini" id="on" data-ifset="on">On</button>
+					<button type="button" class="btn btn-mini" id="off" data-ifset="off">Off</button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>NSFW Mode:</td>
+			<td>
+				<div class="btn-group" data-toggle="buttons-radio" id="nsfw-params">
+					<button type="button" class="btn btn-mini" id="on" data-ifset="on">On</button>
+					<button type="button" class="btn btn-mini" id="off" data-ifset="off">Off</button>
+				</div>
+			</td>
+		</tr>
+	</table>
+
+	<br />
+	<a href="about.html">About</a>
+	</br>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary" onClick="saveSettings()">Save changes</button>
+  </div>
+</div>
+
 </body>
 </html>
 
 <script type=text/html id="details-template">
-<div id='scores-block'><!--TODO: Remove the text shadows for the scores -->
-	<span id='score-ups'>{{ item.ups }}</span>
-	<br />
-	<strong><span id='score-score'>{{ item.score }}</span></strong>
-	<br />
-	<span id='score-downs'>{{ item.downs }}</span>
-</div>
-
 <div id='title-by'>
-	<span id='details-title'>{{ item.title }}</span><!--TODO: possible to cut off text after a certain point? -->
+	<a href="http://www.reddit.com{{ item.permalink }}" id='details-title'>{{ item.title }}</a>
 	<br />
-	by <span id="author"><a href="http://www.reddit.com/user/{{ item.author }}">{{ item.author }}</a></span>
-</div>
-
-<div id='info-block'>
-	on <span id='subreddit'><a href="http://www.reddit.com/r/{{ item.subreddit }}">{{ item.subreddit }}</a></span>
-	<br />
-	<span id='time'>{{ item.localTimeAgo }}</span>
-	<br />
+	Score <strong><span id='score'>{{ item.score }}</span></strong> |
+	by <span id="author"><a href="http://www.reddit.com/user/{{ item.author }}">{{ item.author }}</a></span> |
+	on <span id='subreddit'><a href="http://www.reddit.com/r/{{ item.subreddit }}">{{ item.subreddit }}</a></span> |
+	<span id='time'>{{ item.localTimeAgo }}</span> |
 	<span id='comments'><a href="http://www.reddit.com{{ item.permalink }}">{{ item.num_comments }} comments</a></span>
+	<span id='settings'><a href="#" onClick="showSettings()">icon: wheel settings</a>
 </div>
-
 </script>
 
 <script type=text/html id='gallery-page'>
@@ -59,52 +127,6 @@
 	<!-- Only one of the img or the htmlSpan should be active at any time-->
 	<div id='details'></div>
 </div>
-</script>
-
-<script type=text/html id='settings-modal'>
-	<h1>∞.r</h1>
-
-	<h3>Subreddits:</h3>
-	<span id='subreddits-list'>all</span>
-
-	<h3>Instructions</h3>
-	Hands off your mouse! Use the keyboard instead!
-	<ul>
-		<li><b>j/a</b> - advance to next</li>
-		<li><b>k/s</b> - go back</li>
-		<li><b>d/l</b> - zoom/unzoom to fit</li>
-		<li><b>space</b> - scroll down image, advance to next</li> 
-	</ul>
-
-	<h3>Options</h3>
-	<ul>
-		<li>Zoom Images: 
-			<div class="btn-group" data-toggle="buttons-radio">
-				<button type="button" class="btn">Always</button>
-				<button type="button" class="btn">Except very tall</button>
-				<button type="button" class="btn">Max 75%</button>
-				<button type="button" class="btn">Max 50%</button>
-				<button type="button" class="btn">Never</button>
-			</div>
-		</li>
-		<li>Videos: 
-			<div class="btn-group" data-toggle="buttons-radio">
-				<button type="button" class="btn">Autoplay</button>
-				<button type="button" class="btn">Show</button>
-				<button type="button" class="btn">Off</button>
-			</div>
-		</li>
-		<li>NSFW Mode:
-			<div class="btn-group" data-toggle="buttons-radio">
-				<button type="button" class="btn">On</button>
-				<button type="button" class="btn">Off</button>
-			</div>
-		</li>
-	</ul>
-
-	<br />
-	<a href="about.html">About</a>
-	</br>
 </script>
 
 <script type=text/html id='youtube-template'>

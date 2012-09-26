@@ -58,11 +58,9 @@ item =
             .error(function() { alert("TODO3: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
 */
 
-tah = $('.typeahead');
-tah2 = $("#tah");
-var sourcearr = ["Pics", "starcraft", "all", "funny", "fuuuuuu"];
+var defaultReddits = [ "All", "AdviceAnimals", "announcements", "AskReddit", "atheism", "aww", "bestof", "blog", "funny", "gaming", "IAmA", "movies", "Music", "pics", "politics", "science", "technology", "todayilearned", "videos", "worldnews", "WTF"]; // from /reddits 22Sep12
 
-function f(query, cbFn) {
+function typeaheadSource(query, cbFn) {
 	var bgh = $("#buttonsGoHere");
 	var completions = [];
 	var alreadySelected = [];
@@ -71,25 +69,39 @@ function f(query, cbFn) {
 		alreadySelected.push(child.data("subreddit"));
 	}
 
-	var filtered = sourcearr.filter(function(sub){console.log(sub); return( -1 == alreadySelected.indexOf(sub))});
+	var filtered = defaultReddits.filter(function(sub){return( -1 == alreadySelected.indexOf(sub))});
 	cbFn(filtered);
 }
 
-$('#tah').typeahead({source:f}).on("change", function(){
-	var val = $(this).val();
-	if(val.lenght<2) return;
+function subredditButton(subreddit) {
+	// TODO: Add a proper "x"
+	var button = $("<button />")
+	.addClass("btn")
+	.addClass("btn-mini")
+	.addClass("subreddit-" + subreddit)
+	.data("subreddit", subreddit)
+	.html(subreddit + "  X")
+	.click(function() { $(this).remove() });
 
-	var bgh = $("#buttonsGoHere");
-	if(0==bgh.find(".subreddit-" + val).length)
-	{
-		// TODO: Add a proper "x", make this jQuerified
-		var button = $(	'<button type="button" class="btn subreddit-' + val + '" data-subreddit="' + val + '"' +
-						" onClick='$(this).remove()'>" + val + ' - X</button>'
-		);
-		bgh.append( button );
-	};
+	return(button);		
 }
-);
+
+$('#subredditsTypeahead')
+.typeahead({source:typeaheadSource})
+.change(function(event){
+	var val = $(this).val();
+	if(val.length > 2)  { 
+		var bgh = $("#buttonsGoHere");
+		if(0==bgh.find(".subreddit-" + val).length)
+		{
+			bgh.append(subredditButton(val));
+			$(this).val("");
+		};
+	}
+	event.preventDefault();
+	event.stopPropagation();
+}
+); // NOTE: Before when this was .on( "change") it would reload the page if I picked an element < 2 chars.. still happening on Safari apparently
 
 params = {"whatever":2}
 var groups = ["#onoff"];
@@ -113,28 +125,102 @@ function setParams(params) {
 });
 </script>
 
-<div id="buttonsGoHere">
+<div style="top: 50%; left: 50%">
+	test
+	<!--
+<div class="hero-unit">
+  <h1>Hands off your Mouse!</h1>
+  <p>It's keyboard time!</p>
+  <p>
+	<ul>
+		<li><b>j/a</b> - advance to next</li>
+		<li><b>k/s</b> - go back</li>
+		<li><b>d/l</b> - zoom/unzoom to fit</li>
+		<li><b>space</b> - scroll down image, advance to next</li> 
+	</ul>
+
+    <a class="btn btn-primary btn-large">
+    	Settings
+    </a>
+
+    <a href="about.html">About</a>
+  </p>
+</div>-->
 </div>
-
-<button type="button" class="btn btn-primary" data-loading-text="Loading...">Loading state</button>
-<form>
-	<input type="text" data-provide="typeahead" id="tah">
-</form>
-
 <!-- Modal -->
-<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!--<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+-->
+<div id="settingsModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Modal header</h3>
+    <h3 id="myModalLabel">Infinite Reddit</h3>
   </div>
   <div class="modal-body">
-    <p>One fine body</p>
+	<h4>Hands off your mouse! Use the keyboard instead!</h4>
+	<h4>Keys</h4>
+	<table>
+		<tr>
+			<td><b>j/a</b></td><td>advance</td>
+			<td><b>k/s</b></td><td>go back</td> 
+		</tr>
+		<tr>
+			<td><b>d/l</b></td><td>zoom/unzoom to fit</td>
+			<td><b>space</b></td><td>scroll down image, advance to next</td>
+		</tr>
+	</table>
 
-    Show Images: 
-    			<div id="onoff" class="btn-group" data-toggle="buttons-radio" data-parameter-name="whatever">
-				<button type="button" class="btn active" id="eon" data-if-selected=1>On</button>
-				<button type="button" class="btn" id="eoff" data-if-selected=2>Off</button>
-			</div>
+	<h4>Subreddits</h4>
+	<form>
+		<div id="buttonsGoHere"></div>
+
+		<input type="text" data-provide="typeahead" id="subredditsTypeahead" placeholder="Enter Subreddits">
+		<button type="button" class="btn btn-small">Reset to defaults</button><!-- TODO: reset to defaults -->
+		<button type="button" class="btn btn=small" onClick="$.each( $('#buttonsGoHere').children(), function() {$(this).remove()} );">Clear</button>
+	</form>
+
+	<h4>Options</h4>
+	<table>
+		<tr>
+			<td>
+				Zoom Images:
+			</td>
+			<td>
+				<div class="btn-group" data-toggle="buttons-radio">
+					<button type="button" class="btn btn-mini">Always</button>
+					<button type="button" class="btn btn-mini">Except very tall</button>
+					<button type="button" class="btn btn-mini">Max 75%</button>
+					<button type="button" class="btn btn-mini">Max 50%</button>
+					<button type="button" class="btn btn-mini">Never</button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Videos:
+			</td>
+			<td> 
+				<div class="btn-group" data-toggle="buttons-radio">
+					<button type="button" class="btn btn-mini">Autoplay</button>
+					<button type="button" class="btn btn-mini">Show</button>
+					<button type="button" class="btn btn-mini">Off</button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>NSFW Mode:</td>
+			<td>
+				<div class="btn-group" data-toggle="buttons-radio">
+					<button type="button" class="btn btn-mini">On</button>
+					<button type="button" class="btn btn-mini">Off</button>
+				</div>
+			</td>
+		</tr>
+	</table>
+
+	<br />
+	<a href="about.html">About</a>
+	</br>
+
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -142,8 +228,8 @@ function setParams(params) {
   </div>
 </div>
 
-<!-- Button to trigger modal -->
-<a href="#myModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a>
- <a href="#" onClick='setParams(params);console.log(params);'>Test</a>
+<a href="#settingsModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a>
+ 
+<dl><dt>dt</dt><dd>dd</dd></dl>
 
 </html>
