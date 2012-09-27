@@ -54,8 +54,6 @@ IMAGES_BUFFER_LENGTH = 10;
         if (this.onlineMode) {
             this.seenPermalinks = getSeenPermalinks();
         } else {
-//            localStorage.clear();
-//TODO: Better way to handle this
             this.seenURLs = {};
         }
     }
@@ -107,6 +105,9 @@ IMAGES_BUFFER_LENGTH = 10;
     }
     
     PicFetcher.prototype.getMorePosts = function() {
+        if(!this.subreddits || !this.subreddits.length) {
+            return;
+        }
         if (this.waitingForResponse) {
             return; // already have a live request so do nothing
         }
