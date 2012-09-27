@@ -11,7 +11,7 @@ String.prototype.beginsWith = function(prefix) {
     return this.indexOf(prefix) === 0;
 };
 
-var turl1 = "images/pic06.jpg", //https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", 
+var turl1 = "test/images/pic06.jpg", //https://www.youtube.com/watch?v=r-rauuhbjto&amp;feature=plcp", 
 turl2 = "test/images/2.png", 
 turl3 = "test/images/3.jpg", 
 turl4 = "test/images/4.jpg",
@@ -52,9 +52,10 @@ IMAGES_BUFFER_LENGTH = 10;
         this.itemsIndex = 0;
         
         if (this.onlineMode) {
-            this.seenURLs = getSeenURLs();
+            this.seenPermalinks = getSeenPermalinks();
         } else {
-            localStorage.clear();
+//            localStorage.clear();
+//TODO: Better way to handle this
             this.seenURLs = {};
         }
     }
@@ -181,7 +182,7 @@ IMAGES_BUFFER_LENGTH = 10;
         if (undefined === item || !item.url)
             return false;
         
-        if (this.haveSeenURL(item.url)) {
+        if (this.haveSeenItem(item)) {
             return false;
         }
                 
@@ -192,24 +193,24 @@ IMAGES_BUFFER_LENGTH = 10;
         return true;
     };
     
-    PicFetcher.prototype.setSeenURL = function(url) {
-        this.seenURLs[url] = true;
-        localStorage[url] = (new Date).getTime() 
-    // TODO: handle cleanups of very old URLs since we have a max size of localstorage... maybe on fillup?
+    PicFetcher.prototype.setSeenItem = function(item) {
+        var permalink = item.permalink;
+        this.seenPermalinks[permalink] = true;
+        localStorage[permalink] = (new Date).getTime();
+    }
+
+    PicFetcher.prototype.haveSeenItem = function(item) {
+        return(undefined!==this.seenPermalinks[item.permalink]);
     };
 
-    PicFetcher.prototype.haveSeenURL = function(url) {
-        return(undefined!==this.seenURLs[url]);
-    };
-
-    function getSeenURLs() {
-        var seenURLs = {};
+    function getSeenPermalinks() {
+        var permalinks = {};
         
-        for (var url in localStorage) {
-            seenURLs[url] = localStorage[url];
+        for (var permalink in localStorage) {
+            permalinks[permalink] = localStorage[permalink];
         }
         
-        return (seenURLs);
+        return (permalinks);
     }
         
     PicFetcher.prototype.appendImage = function(item) {
@@ -226,7 +227,6 @@ IMAGES_BUFFER_LENGTH = 10;
             img.width(this.width);
 
             self.imgFn(item, img);
-            self.setSeenURL(item.url);
             self.items.push(item);
         })
         .error(function(){
@@ -240,9 +240,8 @@ IMAGES_BUFFER_LENGTH = 10;
     };
     
     PicFetcher.prototype.enrichItem = function(data) {
-        if(this.haveSeenURL(data.url)) 
+        if(this.haveSeenItem(data)) 
             return;
-        this.setSeenURL(data.url);
 
         var self = this;
         var matches = [{prefixes: ["imgur.com"],fn: function() {
@@ -264,7 +263,7 @@ IMAGES_BUFFER_LENGTH = 10;
                 }
             }
         }
-        reddit.log("No enriching rule for: ", data.url, data);
+        // reddit.log("No enriching rule for: ", data.url, data);
     };
     
     PicFetcher.prototype.handlePosts = function(data) {

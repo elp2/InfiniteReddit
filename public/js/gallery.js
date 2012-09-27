@@ -2,6 +2,36 @@
 var defaultReddits = [ "All", "AdviceAnimals", "announcements", "AskReddit", "atheism", "aww", "bestof", "blog", "funny", "gaming", "IAmA", "movies", "Music", "pics", "politics", "science", "technology", "todayilearned", "videos", "worldnews", "WTF"]; // from /reddits 22Sep12
 var respondToKeys = true;
 
+if(window.location.search == "?reset") {
+    localStorage.clear();
+    alert("Cleared!");
+}
+
+
+function getSubreddits() {
+    var storedSubreddits = localStorage["storedSubreddits"],
+        reddits,
+        hash;
+    if(storedSubreddits) {
+        reddits = JSON.parse(storedSubreddits);
+        reddit.log("Using storedSubreddits: ", storedSubreddits);
+        if(reddits.length)
+            return(reddits);
+    }
+
+    var hash = window.location.hash;
+    if(undefined==hash){
+        return([]);
+    }
+    hash = hash.slice(1);
+    if(hash.length==0) {
+        return([]);
+    }
+    reddits = hash.split("+");
+    return(reddits);
+}    
+
+
 $(document).ready(function() {    
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
@@ -18,7 +48,6 @@ $(document).ready(function() {
     _.templateSettings = {
       interpolate : /\{\{(.+?)\}\}/g
     };
-
     
     gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
 
@@ -38,9 +67,10 @@ $(document).ready(function() {
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
                                         imgFn: addImg,
                                         htmlFn: addHtml,
-                                        show_over_18: localStorage["show_over_18"],
-                                        show_videos: localStorage["show_videos"]
+                                        show_over_18: localStorage["show_over_18"]==="on",
+                                        show_videos: localStorage["show_videos"]==="on"
                                         });
+
 
     function start() {
         var subReddits = getSubreddits();
@@ -61,7 +91,7 @@ $(document).ready(function() {
 
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
-        
+        picFetcher.setSeenItem(slide.item);
         var page = $(gallery.masterPages[i]),
             htmlSpan = page.find("#htmlSpan"),
             img = page.find("#gallery-img"),
@@ -240,30 +270,6 @@ $(document).ready(function() {
         addSlide({url: item.url, width: fittedSize.width, height: fittedSize.height, item: item});
     }
 
-    function getSubreddits() {
-        var storedSubreddits = localStorage["storedSubreddits"],
-            reddits,
-            hash;
-        if(storedSubreddits) {
-            reddits = JSON.parse(storedSubreddits);
-            reddit.log("Using storedSubreddits: ", storedSubreddits);
-            if(reddits.length)
-                return(reddits);
-        }
-
-        var hash = window.location.hash;
-        if(undefined==hash){
-            return([]);
-        }
-        hash = hash.slice(1);
-        if(hash.length==0) {
-            return(["all"]);
-        }
-        console.log("reddits: ", reddits)
-        reddits = hash.split("+");
-        return(reddits);
-    }    
-
     $('#subredditsTypeahead')
     .typeahead({source:typeaheadSource})
     .change(function(event){
@@ -313,12 +319,12 @@ function subredditButton(subreddit) {
 }
 
 function getButtonData(params) {
-    for(var group in params) {
-        group = $("#" + group);
-        active = group.find(".active");
-        params[group] = active.data("ifset");
+    for(var paramName in params) {
+        var group = $("#" + paramName);
+        var active = group.find(".active");
+        params[paramName] = active.data("ifset");
     }
-    return;
+    return params;
 }
 
 function setButtonData(params) {
@@ -327,10 +333,9 @@ function setButtonData(params) {
         group = $("#" + group);
         var toActivate = group.find("#" + val );
         if(toActivate.length) {
-            console.log("activating", toActivate);
             toActivate.addClass("active");
         } else {
-            console.log("Can't activea????");
+            console.log("Couldn't find active for ", val, " in ", group);
             debugger;
         }
     }
@@ -349,24 +354,53 @@ function getParams() {
             params[param] = localStorage[param];
         }
     }
+
+
     return(params);
 }
 
 function showSettings() {
-    console.log("settings!");
     var params = getParams();
-    console.log(params);
     setButtonData(params);
+
+    var subReddits = getSubreddits();
+    var bgh = $("#buttonsGoHere");
+    for (var i = bgh.children().length - 1; i >= 0; i--) {
+        $(bgh.children()[i]).remove();
+    }
+    for (i = subReddits.length - 1; i >= 0; i--) {
+        bgh.append(subredditButton(subReddits[i]));
+    };
     $("#settingsModal").modal();
+}
+
+function getModalSubreddits() {
+    var subReddits = [];
+
+    var bgh = $("#buttonsGoHere");
+    for (var i = bgh.children().length - 1; i >= 0; i--) {
+        var child = $(bgh.children()[i]);
+        subReddits.push(child.data("subreddit"));
+    }
+    return(subReddits);
 }
 
 function saveSettings() {
     var settings = getButtonData(defaultParams);
-    console.log("settings!", settings);
     for(var key in settings) {
         localStorage[key] = settings[key];
     }
-
     picFetcher.setShow_Videos(settings["video-params"]==="on");
     picFetcher.setShow_over_18(settings["nsfw-params"]==="on");
+
+    var subReddits = getModalSubreddits();
+    if(!subReddits.length) {
+        alert("Please pick at least one subreddit!");
+        return;
+    }
+
+    picFetcher.setSubreddits(subReddits);
+    localStorage["storedSubreddits"] = JSON.stringify(subReddits);
+
+    $("#settingsModal").modal("hide"); 
 }
