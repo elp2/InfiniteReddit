@@ -310,7 +310,6 @@ function typeaheadSource(query, cbFn) {
 }
 
 function subredditButton(subreddit) {
-    // TODO: Add a proper "x"
     var button = $("<button />")
     .addClass("btn")
     .addClass("btn-mini")
@@ -335,18 +334,16 @@ function setButtonData(params) {
     for(var group in params) {
         var val = params[group];
         group = $("#" + group);
-        var toActivate = group.find("#" + val );
+        var toActivate = group.find("[data-ifset='" + val + "']");
         if(toActivate.length) {
             toActivate.addClass("active");
         } else {
-            console.log("Couldn't find active for ", val, " in ", group);
-            debugger;
+            reddit.log("Couldn't find active for ", val, " in ", group);
         }
     }
 }
 
 var defaultParams = { 
-//    "zoom-params":  "always",
     "video-params": "off",
     "nsfw-params":  "off",
 }
