@@ -176,19 +176,23 @@ $(document).ready(function() {
         
         var img = getCurrentImage();
 
-        var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32;
+        var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32,
+        leftCode = 37, rightCode = 39, downCode = 40;
         switch (event.which) {
             case jCode:
             case aCode:
+            case rightCode:
                 advanceImg();
                 break;
             
             case kCode:
             case sCode:
+            case leftCode:
                 retreatImg();
                 break;
             
             case spaceCode:
+            case downCode:
                 if (null === img.data('orig-top')) {
                     img.data('orig-top', img.offset().top);
                 }
