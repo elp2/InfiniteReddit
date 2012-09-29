@@ -264,3 +264,9 @@ body {
 	background-size: 25px 23px;
 	background-position: 0px 0px;
 }
+
+.body-unit {
+	width: 400px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
