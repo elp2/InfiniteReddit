@@ -273,7 +273,8 @@ $(document).ready(function() {
     }
 
     $('#subredditsTypeahead')
-    .typeahead({source:typeaheadSource})
+    .typeahead({source:typeaheadSource, 
+        menu: '<ul class="typeahead dropdown-menu" style="z-index: 100000"></ul>'})
     .change(function(event){
         var val = $(this).val();
         console.log("changing:", val)
@@ -384,7 +385,7 @@ function showSettings() {
     for (i = subReddits.length - 1; i >= 0; i--) {
         bgh.append(subredditButton(subReddits[i]));
     };
-    $("#settingsModal").modal();
+    $("#settingsModal").modal( {backdrop: "static" });
 }
 
 function getModalSubreddits() {
@@ -416,4 +417,5 @@ function saveSettings() {
     localStorage["storedSubreddits"] = JSON.stringify(subReddits);
 
     $("#settingsModal").modal("hide"); 
+    respondToKeys = true;
 }
