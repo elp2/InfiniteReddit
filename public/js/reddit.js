@@ -43,6 +43,7 @@ IMAGES_BUFFER_LENGTH = 10;
         this.onlineMode = !!options.onlineMode;
         this.imgFn = options.imgFn; 
         this.htmlFn = options.htmlFn;
+        this.statusFn = options.statusFn;
         this.show_over_18 = !!options.show_over_18;
         this.show_videos = !!options.show_videos;
         
@@ -73,6 +74,7 @@ IMAGES_BUFFER_LENGTH = 10;
         this.items = [];
         this.itemsIndex = 0;   
         this.getMorePosts();     
+        this.nsfwDiscarded = this.consecutiveDiscarded = 0;
     };
 
     // Getting Posts
@@ -221,9 +223,11 @@ IMAGES_BUFFER_LENGTH = 10;
     }
         
     PicFetcher.prototype.appendImage = function(item) {
-        if(!this.shouldShowImage(item))
+        if(!this.shouldShowImage(item)) {
+            this.consecutiveDiscarded++;
             return;
-
+        }
+        this.consecutiveDiscarded = 0;
         var self = this;
        	// Insert preloaded image after it finishes loading via "load" callback
         $('<img />')
@@ -288,9 +292,11 @@ IMAGES_BUFFER_LENGTH = 10;
                     self.enrichItem(item.data);
                 }
                 self.fetcherSawItem(item);
+            } else {
+                self.nsfwDiscarded++;
             }
         });
-        
+        this.statusFn(this.consecutiveDiscarded, this.nsfwDiscarded);        
         this.resetTimes();
     };
         

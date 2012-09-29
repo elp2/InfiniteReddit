@@ -1,0 +1,25 @@
+	<!--
+		<tr>
+			<td>
+				Zoom Images:
+			</td>
+			<td>
+				<div class="btn-group" data-toggle="buttons-radio" id="zoom-params">
+					<button type="button" class="btn btn-mini" id="always" data-ifset="always">Always</button>
+					<button type="button" class="btn btn-mini" id="exceptVeryTall" data-ifset="exceptVeryTall">Except very tall</button>
+					<button type="button" class="btn btn-mini" id="max75" data-ifset="max75">Max 75%</button>
+					<button type="button" class="btn btn-mini" id="max50" data-ifset="max50">Max 50%</button>
+					<button type="button" class="btn btn-mini" id="never" data-ifset="never">Never</button>
+				</div>
+			</td>
+		</tr>-->
+<!--		<tr>
+			<td>
+				Videos:
+			</td>
+			<td> 
+					<button type="button" class="btn btn-mini" id="on" data-ifset="on">On</button>
+					<button type="button" class="btn btn-mini" id="off" data-ifset="off">Off</button>
+				</div>
+			</td>
+		</tr>-->

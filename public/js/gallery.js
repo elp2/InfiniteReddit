@@ -2,9 +2,9 @@ var respondToKeys = true;
 
 if(window.location.search == "?reset") {
     localStorage.clear();
-    alert("Cleared!");
 }
 
+var subReddits = [];
 
 function getSubreddits() {
     var storedSubreddits = localStorage["storedSubreddits"],
@@ -65,13 +65,27 @@ $(document).ready(function() {
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
                                         imgFn: addImg,
                                         htmlFn: addHtml,
+                                        statusFn: updateStatus,
                                         show_over_18: localStorage["show_over_18"]==="on",
                                         show_videos: localStorage["show_videos"]==="on"
                                         });
 
 
+    function updateStatus(consecutiveDiscarded, nsfwDiscarded) {
+        console.log(nsfwDiscarded);
+        var statusHTML = "<ul>";
+        if(consecutiveDiscarded > 10) {
+            statusHTML += "<li>" + consecutiveDiscarded + " unshown items.  Maybe you have seen all of reddit.  Come back later or change settings.</li>";
+        }
+        if(nsfwDiscarded > 10) {
+            statusHTML += "<li>" + nsfwDiscarded + " NSFW skipped. Turn on in settings?";
+        }
+        statusHTML += "</ul>";
+        status = $("#loading-status").html(statusHTML);
+    }
+
     function start() {
-        var subReddits = getSubreddits();
+        subReddits = getSubreddits();
         if(subReddits.length) {
             picFetcher.setSubreddits(subReddits);
         } else {
@@ -274,20 +288,20 @@ $(document).ready(function() {
 
     $('#subredditsTypeahead')
     .typeahead({source:typeaheadSource, 
-        menu: '<ul class="typeahead dropdown-menu" style="z-index: 100000"></ul>'})
+        menu: '<ul class="typeahead dropdown-menu" style="z-index: 100000"></ul>',
+        matcher: function (item) {
+            return 0===item.toLowerCase().indexOf(this.query.toLowerCase());
+        }
+    })
     .change(function(event){
         var val = $(this).val();
-        console.log("changing:", val)
 
         if(val.length > 2)  { 
-            console.log("onChange>2:", val );
 
             var bgh = $("#buttonsGoHere");
             if(0==bgh.find(".subreddit-" + val).length)
             {
-                var srb = subredditButton(val);
-                console.log(srb);
-                bgh.append(srb);
+                bgh.append(subredditButton(val));
                 $(this).val("");
             };
         }
@@ -351,13 +365,11 @@ function setButtonData(params) {
         if(toActivate.length) {
             toActivate.addClass("active");
         } else {
-            reddit.log("Couldn't find active for ", val, " in ", group);
         }
     }
 }
 
 var defaultParams = { 
-    "video-params": "off",
     "nsfw-params":  "off",
 }
 
@@ -368,8 +380,6 @@ function getParams() {
             params[param] = localStorage[param];
         }
     }
-
-
     return(params);
 }
 
@@ -385,7 +395,7 @@ function showSettings() {
     for (i = subReddits.length - 1; i >= 0; i--) {
         bgh.append(subredditButton(subReddits[i]));
     };
-    $("#settingsModal").modal( {backdrop: "static" });
+    $("#settingsModal").modal( {backdrop: "static", keyboard: false });
 }
 
 function getModalSubreddits() {
@@ -404,10 +414,11 @@ function saveSettings() {
     for(var key in settings) {
         localStorage[key] = settings[key];
     }
+
     picFetcher.setShow_Videos(settings["video-params"]==="on");
     picFetcher.setShow_over_18(settings["nsfw-params"]==="on");
 
-    var subReddits = getModalSubreddits();
+    subReddits = getModalSubreddits();
     if(!subReddits.length) {
         alert("Please pick at least one subreddit!");
         return;

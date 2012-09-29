@@ -21,7 +21,6 @@ body {
 	-o-text-size-adjust:none;
 	text-size-adjust:none;
 	color:#eee;
-	font-family:helvetica;
 	font-size:12px;
 }
 
@@ -134,14 +133,12 @@ body {
 	transform:translate(0,-100%) translateZ(0);
 }
 
-#swipeview-slider #details a {
-	color: #FF0000; 
-}
-
 #swipeview-slider #details #details-title {
-	font-size: 2.5em;
+	padding-top: 2px;
+	font-size: 23px;
+	height: 30px;
 	text-overflow: ellipsis;
-	overflow: hidden;
+	overflow-x: hidden;
 	max-width: 95%;
 	white-space: nowrap;
 	display: inline-block;
@@ -249,6 +246,7 @@ body {
 
 #settings {
 	float: right;
+	font-size:1.5em;
 }
 
 #myModalLabel {
