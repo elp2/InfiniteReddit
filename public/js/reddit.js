@@ -74,7 +74,7 @@ IMAGES_BUFFER_LENGTH = 10;
         this.items = [];
         this.itemsIndex = 0;   
         this.getMorePosts();     
-        this.nsfwDiscarded = this.consecutiveDiscarded = 0;
+        this.nsfwDiscarded = this.consecutiveDiscarded = this.fetchingErrors = 0;
     };
 
     // Getting Posts
@@ -107,6 +107,8 @@ IMAGES_BUFFER_LENGTH = 10;
     }
     
     PicFetcher.prototype.getMorePosts = function() {
+        this.updateStatus();
+
         if(!this.subreddits || !this.subreddits.length) {
             return;
         }
@@ -152,7 +154,12 @@ IMAGES_BUFFER_LENGTH = 10;
             $.getJSON(url, function(data) {
                 self.handlePosts(data);
             })
-            .error(function() { reddit.error("Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
+            .error(function() { 
+                self.fetchingErrors++; 
+                self.updateStatus(); 
+                self.resetTimes();
+                setTimeout(function(){self.getMorePosts()}, 3*REDDIT_THROTTLE_MS);
+            });
         } else {
             this.afterTag = "";
             for (var i = testingJsonData.data.children.length - 1; i >= 0; i--) {
@@ -277,6 +284,10 @@ IMAGES_BUFFER_LENGTH = 10;
         // reddit.log("No enriching rule for: ", data.url, data);
     };
     
+    PicFetcher.prototype.updateStatus = function() {
+        this.statusFn(this.consecutiveDiscarded, this.nsfwDiscarded, this.fetchingErrors);        
+    }
+
     PicFetcher.prototype.handlePosts = function(data) {
         this.afterTag = data.data && data.data.after;
         if (!this.afterTag) {
@@ -296,7 +307,7 @@ IMAGES_BUFFER_LENGTH = 10;
                 self.nsfwDiscarded++;
             }
         });
-        this.statusFn(this.consecutiveDiscarded, this.nsfwDiscarded);        
+        this.updateStatus();
         this.resetTimes();
     };
         
@@ -342,10 +353,6 @@ IMAGES_BUFFER_LENGTH = 10;
 
     	var videoIdRe = /.*v=([^&]*)/,
     		videoId = videoIdRe.exec(item.url)[1];
-
-        reddit.log("testing: ", videoId);
-        reddit.error("testing: ", videoId);
-
 
     	if(videoId) {
 	    	var html = _.template($("#youtube-template").html())({videoId:videoId});

@@ -214,23 +214,32 @@ body {
 
 
 #info-popup {
-
   position:absolute;
   z-index:500;
   top:50%;
-  width:200px;
-  height:100px;
+  width:300px;
+  height:300px;
   left:50%;
-  margin-left: -100px;
-  margin-top: -50px;
-  text-align:center;
+  margin-left: -150px;
+  margin-top: -150px;
+}
 
-  background:rgba(255,0,0,0.80);
-  -webkit-border-radius:10px;
-  -moz-border-radius:10px;
-  -ms-border-radius:10px;
-  -o-border-radius:10px;
-  border-radius:10px;  
+#info-popup > #loading-status {
+	height: 150px;
+}
+
+#info-popup > .dino {
+	position: absolute;
+
+	left: 50%;
+	margin-left: -100px;
+	top: 50%;
+	margin-top:-92px;
+	opacity:0.2;
+}
+
+#info-popup > .settings {
+	position:absolute;right:0;bottom:0
 }
 
 #title-by {

@@ -71,16 +71,17 @@ $(document).ready(function() {
                                         });
 
 
-    function updateStatus(consecutiveDiscarded, nsfwDiscarded) {
-        console.log(nsfwDiscarded);
-        var statusHTML = "<ul>";
+    function updateStatus(consecutiveDiscarded, nsfwDiscarded, errorFetching) {        
+        var statusHTML = "";
+        if(errorFetching) {
+            statusHTML += "<p>" + errorFetching + " errors connecting to reddit.  Reload page or check settings to see if all reddits are correct.</p>";            
+        }
         if(consecutiveDiscarded > 10) {
-            statusHTML += "<li>" + consecutiveDiscarded + " unshown items.  Maybe you have seen all of reddit.  Come back later or change settings.</li>";
+            statusHTML += "<p>" + consecutiveDiscarded + " unshown items.  Maybe you have seen all of reddit.  Come back later or change settings.</p>";
         }
         if(nsfwDiscarded > 10) {
-            statusHTML += "<li>" + nsfwDiscarded + " NSFW skipped. Turn on in settings?";
+            statusHTML += "<p>" + nsfwDiscarded + " NSFW skipped. Turn on in settings to view</p>";
         }
-        statusHTML += "</ul>";
         status = $("#loading-status").html(statusHTML);
     }
 
@@ -184,6 +185,8 @@ $(document).ready(function() {
 
     $(document).keydown(function(event) {
         if (!respondToKeys)
+            return;
+        if(0==slides.length)
             return;
         
         var img = getCurrentImage();
@@ -314,8 +317,6 @@ $(document).ready(function() {
     .submit(function(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        console.log("prevented!");
     });
 
 // end document ready
