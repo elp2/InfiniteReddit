@@ -194,10 +194,16 @@ IMAGES_BUFFER_LENGTH = 10;
         return true;
     };
     
-    PicFetcher.prototype.setSeenItem = function(item) {
+    // We only want to persist that we saw the item when the user sees the item.
+    PicFetcher.prototype.userSawItem = function(item) {
+        var permalink = item.permalink;
+        localStorage[permalink] = (new Date).getTime();
+    }
+
+    // Need to keep internal track of what item's the fetcher saw so it doesn't add them twice
+    PicFetcher.prototype.fetcherSawItem = function(item) {
         var permalink = item.permalink;
         this.seenPermalinks[permalink] = true;
-        localStorage[permalink] = (new Date).getTime();
     }
 
     PicFetcher.prototype.haveSeenItem = function(item) {
@@ -281,6 +287,7 @@ IMAGES_BUFFER_LENGTH = 10;
                 } else {
                     self.enrichItem(item.data);
                 }
+                self.fetcherSawItem(item);
             }
         });
         

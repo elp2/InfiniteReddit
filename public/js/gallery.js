@@ -1,5 +1,3 @@
-// TODO: Proper list of defaults
-var defaultReddits = [ "All", "AdviceAnimals", "announcements", "AskReddit", "atheism", "aww", "bestof", "blog", "funny", "gaming", "IAmA", "movies", "Music", "pics", "politics", "science", "technology", "todayilearned", "videos", "worldnews", "WTF"]; // from /reddits 22Sep12
 var respondToKeys = true;
 
 if(window.location.search == "?reset") {
@@ -91,7 +89,7 @@ $(document).ready(function() {
 
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
-        picFetcher.setSeenItem(slide.item);
+        picFetcher.userSawItem(slide.item);
         var page = $(gallery.masterPages[i]),
             htmlSpan = page.find("#htmlSpan"),
             img = page.find("#gallery-img"),
@@ -252,7 +250,7 @@ $(document).ready(function() {
 
         // Shrink things if doing so slightly will make them fit completely on the page
         var acceptableShrink = 0.75;
-        var maxHeight = $(window).height() - 70*2; // TODO: This is 2x the titlebar... move its centering down 64px to save 64px on the bottom
+        var maxHeight = $(window).height() - 70*2;
         if(forceShrink || (maxHeight < scaledHeight && maxHeight / scaledHeight > acceptableShrink)) {
             var newWidth = scaledWidth * (maxHeight / scaledHeight);
             if(newWidth<maxWidth) {
@@ -278,18 +276,32 @@ $(document).ready(function() {
     .typeahead({source:typeaheadSource})
     .change(function(event){
         var val = $(this).val();
+        console.log("changing:", val)
+
         if(val.length > 2)  { 
+            console.log("onChange>2:", val );
+
             var bgh = $("#buttonsGoHere");
             if(0==bgh.find(".subreddit-" + val).length)
             {
-                bgh.append(subredditButton(val));
+                var srb = subredditButton(val);
+                console.log(srb);
+                bgh.append(srb);
                 $(this).val("");
             };
         }
         event.preventDefault();
         event.stopPropagation();
     }
-    ); // NOTE: Before when this was .on( "change") it would reload the page if I picked an element < 2 chars.. still happening on Safari apparently
+    ); 
+
+    $("#modalForm") // prevent the auto-submitting of the form on enter
+    .submit(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log("prevented!");
+    });
 
 // end document ready
 });
@@ -305,7 +317,7 @@ function typeaheadSource(query, cbFn) {
         alreadySelected.push(child.data("subreddit"));
     }
 
-    var filtered = defaultReddits.filter(function(sub){return( -1 == alreadySelected.indexOf(sub))});
+    var filtered = SFWReddits.filter(function(sub){return( -1 == alreadySelected.indexOf(sub))});
     cbFn(filtered);
 }
 
@@ -315,8 +327,8 @@ function subredditButton(subreddit) {
     .addClass("btn-mini")
     .addClass("subreddit-" + subreddit)
     .data("subreddit", subreddit)
-    .html(subreddit + "  X")
-    .click(function() { $(this).remove() });
+    .html(subreddit + " - X")
+    .click(function(e) { if(e.clientX!=0 && e.clientY!=0) { $(this).remove() } }); // get spurious clicks at 0,0 when submitting without typeahead
 
     return(button);     
 }

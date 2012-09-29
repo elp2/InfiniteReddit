@@ -250,3 +250,10 @@ body {
 #settings {
 	float: right;
 }
+
+#myModalLabel {
+	padding-left: 26px;
+	background: url(../img/bestgraph.com.dinosaures-84.gif) no-repeat top left;
+	background-size: 25px 23px;
+	background-position: 0px 0px;
+}
