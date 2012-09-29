@@ -411,6 +411,9 @@ function getModalSubreddits() {
 }
 
 function saveSettings() {
+//    $.each($("formErrors").children()
+    $.each($("#formErrors").children(), function(){$(this).remove()});
+
     var settings = getButtonData(defaultParams);
     for(var key in settings) {
         localStorage[key] = settings[key];
@@ -420,8 +423,11 @@ function saveSettings() {
     picFetcher.setShow_over_18(settings["nsfw-params"]==="on");
 
     subReddits = getModalSubreddits();
+
     if(!subReddits.length) {
-        alert("Please pick at least one subreddit!");
+        $("#formErrors")
+        .append($('<div id="pickOneSubreddit" class="alert alert-error">Please pick at least one Subreddit</div>'));
+
         return;
     }
 

@@ -44,8 +44,14 @@
   <div class="modal-body">
 	<h4>Hands off your mouse! Use the keyboard instead!</h4>
 	<hr>
-	<h4>Keys</h4>
-	<table border=1>
+	<h4>Navigation</h4>
+	<i class="icon-arrow-right icon-large"></i> j/a/right<br/>
+	<i class="icon-arrow-left icon-large"></i> k/a/left<br/>
+	<i class="icon-arrow-down icon-large"></i> space/down<br/>
+	<i class="icon-zoom-in icon-large"></i> d/l<br/>
+
+	<!--
+	<table border=1 class="table">
 		<tr>
 			<td><b>j/a/right</b></td><td>advance</td>
 			<td><b>k/s/left</b></td><td>go back</td> 
@@ -54,7 +60,7 @@
 			<td><b>d/l</b></td><td>zoom/unzoom to fit</td>
 			<td><b>space/down</b></td><td>scroll down image, advance to next</td>
 		</tr>
-	</table>
+	</table>-->
 	<br />
 	<h4>Subreddits</h4>
 
@@ -63,6 +69,8 @@
 
 		<input type="text" data-provide="typeahead" id="subredditsTypeahead" placeholder="Enter Subreddits"> or 
 		<button type="button" class="btn btn-primary" onClick='$("#buttonsGoHere").append(subredditButton("All"));'>All</button>
+
+		<div id="formErrors"></div>
 	</form>
 
 	<h4>Options</h4>
@@ -84,7 +92,7 @@
 
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" onClick="saveSettings()">OK</button>
+    <button class="btn btn-primary" onClick="saveSettings()"><img width=25 height=23 src='img/bestgraph.com.dinosaures-84.gif'> OK</button>
   </div>
 </div>
 
