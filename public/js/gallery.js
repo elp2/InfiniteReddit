@@ -300,10 +300,12 @@ $(document).ready(function() {
         var val = $(this).val();
 
         if(val.length > 2)  { 
-
             var bgh = $("#buttonsGoHere");
             if(0==bgh.find(".subreddit-" + val).length)
             {
+                var allButton = bgh.find(".subreddit-All");
+                allButton.remove();
+
                 bgh.append(subredditButton(val));
                 $(this).val("");
             };
@@ -356,6 +358,12 @@ function getButtonData(params) {
         params[paramName] = active.data("ifset");
     }
     return params;
+}
+
+function allButtonClicked() {
+    $.each($("#buttonsGoHere").children(), function(){$(this).remove()});
+
+    $("#buttonsGoHere").append(subredditButton("All"));
 }
 
 function setButtonData(params) {
@@ -411,7 +419,6 @@ function getModalSubreddits() {
 }
 
 function saveSettings() {
-//    $.each($("formErrors").children()
     $.each($("#formErrors").children(), function(){$(this).remove()});
 
     var settings = getButtonData(defaultParams);
