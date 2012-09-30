@@ -124,7 +124,7 @@ IMAGES_BUFFER_LENGTH = 10;
         }, throttleTime);
     };
     
-    function urlForSubreddits(subreddits, after) {
+    PicFetcher.prototype._getUrlForSubreddits = function(subreddits, after) {
         var redditsURLBase = "http://www.reddit.com/r/";
         var redditURLJsonEnding = "/.json?jsonp=?";
         
@@ -150,7 +150,7 @@ IMAGES_BUFFER_LENGTH = 10;
         var self = this;
 
         if (this.onlineMode) {
-            var url = urlForSubreddits(this.subreddits, this.afterTag);
+            var url = this._getUrlForSubreddits(this.subreddits, this.afterTag);
             $.getJSON(url, function(data) {
                 self.handlePosts(data);
             })

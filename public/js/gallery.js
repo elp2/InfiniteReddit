@@ -240,7 +240,14 @@ $(document).ready(function() {
         }
     });
     
+    var seenPL = {}; // TODO: Remove(testing)
     function addSlide(slide) {
+        if(slide.item.permalink){
+            if(seenPL[slide.item.permalink])
+                alert("!!!!!!!!!! DUPE PL!");
+            seenPL[slide.item.permalink] = true;
+        } // TODO: Remove(testing);
+        
         $("#info-popup").hide();
 
         var newPageI = gallery.options.numberOfPages,
