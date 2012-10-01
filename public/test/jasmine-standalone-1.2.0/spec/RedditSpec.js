@@ -1,3 +1,7 @@
+
+
+
+
 describe("Reddit.PicFetcher", function() {
   var picFetcher;
 
