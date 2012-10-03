@@ -1,6 +1,9 @@
 /*jshint browser:true, jquery:true, devel:true */
 /*global localStorage: false, _:false, REDDIT_THROTTLE_MS:false, TESTING_LOAD_DELAY_MS:false, testingJsonData: false */
 
+_.templateSettings = {
+  interpolate : /\{\{(.+?)\}\}/g
+};
 
 
 String.prototype.endsWith = function(suffix) {
@@ -29,6 +32,7 @@ testingJsonData = {
 REDDIT_THROTTLE_MS = 2000; // Max refresh rate as described in the Reddit APIs
 TESTING_LOAD_DELAY_MS = 2;
 IMAGES_BUFFER_LENGTH = 10;
+ASSUME_404_AFTER_MS = 4000;
 
 !function(window) {
     'use strict';
@@ -51,6 +55,7 @@ IMAGES_BUFFER_LENGTH = 10;
         this.waitingForResponse = false;
         this.items = [];
         this.itemsIndex = 0;
+        this.hnct = "";
         
         if (this.onlineMode) {
             this.seenPermalinks = getSeenPermalinks();
@@ -67,9 +72,9 @@ IMAGES_BUFFER_LENGTH = 10;
         this.show_videos = bool;
     }
 
-    PicFetcher.prototype.setSubreddits = function(subreddits) {
-        reddit.log("Setting subreddits to", subreddits);
+    PicFetcher.prototype.setSubreddits = function(subreddits, hnct) {
         this.subreddits = subreddits;
+        this.hnct = hnct;
         this.afterTag = "";
         this.items = [];
         this.itemsIndex = 0;   
@@ -124,18 +129,14 @@ IMAGES_BUFFER_LENGTH = 10;
         }, throttleTime);
     };
     
-    PicFetcher.prototype._getUrlForSubreddits = function(subreddits, after) {
-        var redditsURLBase = "http://www.reddit.com/r/";
-        var redditURLJsonEnding = "/.json?jsonp=?";
-        
-        var url = redditsURLBase;
-        url = url + subreddits.join("+");
-        url = url + redditURLJsonEnding;
-        if (after.length > 0) {
-            url = url + "&after=" + after;
-        }
-        reddit.log("Getting URL=", url);
-        
+    PicFetcher.prototype._getUrlForSubreddits = function(subreddits, after, hnct) {
+        var redditURLTemplate = "http://www.reddit.com/r/{{subredditsString}}/{{hnctString}}/.json?jsonp=?{{afterString}}";
+
+        var url = _.template(redditURLTemplate, { subredditsString: subreddits.join("+"),
+                                                  hnctString: hnct,
+                                                  afterString: after.length>0 ? "&after=" + after : "" });
+
+        reddit.log("Getting URL=", url);        
         return url;
     }
     
@@ -146,20 +147,29 @@ IMAGES_BUFFER_LENGTH = 10;
                     setTimeout(function() {self.handlePosts(here);}, cumDelay);
                 }
 
+    PicFetcher.prototype.fetchingError = function() {
+        reddit.error("Error fetching from Reddit");
+        this.fetchingErrors++; 
+        this.updateStatus(); 
+        this.resetTimes();
+        var self = this;
+        setTimeout(function(){self.getMorePosts()}, 1.5*REDDIT_THROTTLE_MS);
+    }
     PicFetcher.prototype._getMorePosts = function() {
         var self = this;
 
         if (this.onlineMode) {
-            var url = this._getUrlForSubreddits(this.subreddits, this.afterTag);
+            var url = this._getUrlForSubreddits(this.subreddits, this.afterTag, this.hnct);
+            var success = false;            
             $.getJSON(url, function(data) {
+                success = true;
                 self.handlePosts(data);
             })
             .error(function() { 
-                self.fetchingErrors++; 
-                self.updateStatus(); 
-                self.resetTimes();
-                setTimeout(function(){self.getMorePosts()}, 3*REDDIT_THROTTLE_MS);
+                self.fetchingError();
             });
+            // Check for 404's by using a timeout since we don't get any JSON callbacks since there's no JSON to inject into the page
+            setTimeout(function() { if(!success) { self.fetchingError() } }, ASSUME_404_AFTER_MS);
         } else {
             this.afterTag = "";
             for (var i = testingJsonData.data.children.length - 1; i >= 0; i--) {

@@ -17,11 +17,11 @@ describe("Reddit.PicFetcher", function() {
   });
 
   it("makes proper base URL", function() {
-    expect(picFetcher._getUrlForSubreddits(["All", "funny"], "")).toEqual("http://www.reddit.com/r/All+funny/.json?jsonp=?");
+    expect(picFetcher._getUrlForSubreddits(["All", "funny"], "", "hot")).toEqual("http://www.reddit.com/r/All+funny/hot/.json?jsonp=?");
   });
 
   it("makes proper after URL", function() {
-    expect(picFetcher._getUrlForSubreddits(["All", "funny"], "afterTag")).toEqual("http://www.reddit.com/r/All+funny/.json?jsonp=?&after=afterTag");
+    expect(picFetcher._getUrlForSubreddits(["All", "funny"], "afterTag", "hot")).toEqual("http://www.reddit.com/r/All+funny/hot/.json?jsonp=?&after=afterTag");
   });
 
 
