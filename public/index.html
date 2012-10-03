@@ -63,18 +63,8 @@
 	<i class="icon-arrow-down icon-large"></i> space/down<br/>
 	<i class="icon-zoom-in icon-large"></i> d/l<br/>
 
-	<!--
-	<table border=1 class="table">
-		<tr>
-			<td><b>j/a/right</b></td><td>advance</td>
-			<td><b>k/s/left</b></td><td>go back</td> 
-		</tr>
-		<tr>
-			<td><b>d/l</b></td><td>zoom/unzoom to fit</td>
-			<td><b>space/down</b></td><td>scroll down image, advance to next</td>
-		</tr>
-	</table>-->
 	<br />
+
 	<h4>Subreddits</h4>
 
 	<form id="modalForm">
@@ -82,6 +72,12 @@
 
 		<input type="text" data-provide="typeahead" id="subredditsTypeahead" placeholder="Enter Subreddits"> or 
 		<button type="button" class="btn btn-primary" onClick='allButtonClicked();'>All</button>
+		<div class="btn-group" data-toggle="buttons-radio" id="hnct-params">
+			<button type="button" class="btn btn-mini " data-ifset="hot">Hot</button>
+			<button type="button" class="btn btn-mini " data-ifset="new">New</button>
+			<button type="button" class="btn btn-mini " data-ifset="controversial">Controversial</button>
+			<button type="button" class="btn btn-mini " data-ifset="top">Top</button>
+		</div>
 
 		<div id="formErrors"></div>
 	</form>
