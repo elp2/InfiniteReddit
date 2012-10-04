@@ -29,37 +29,56 @@ function getSubreddits() {
     return(reddits);
 }    
 
+function getCurrentImage() { return($(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img")); }
+
+function resetImageSize(img) {
+    img.width(img.data('orig-width'));
+    img.height(img.data('orig-height'));
+    var origTop = img.data('orig-top');
+    if (null !== origTop) {
+        img.offset({top: origTop});
+        img.data('orig-top', null);
+    }
+}
+
+function resetSlides() {
+    slides = [];
+    for (i = 0; i < 3; i++) {
+        var masterPage = $(gallery.masterPages[i]);
+        if(masterPage.children().length === 0) {
+            el = $($('#gallery-page').html());
+            el.find("#htmlSpan").hide();
+            el.find("#gallery-img").hide();
+
+            el.find("#gallery-img").load(function() {this.className='';}); 
+            masterPage.append(el);
+        } else {
+            masterPage.find("#htmlSpan").hide();
+            masterPage.find("#gallery-img").hide();
+            masterPage.find("#details").html("")
+        }
+    }
+    $("#info-popup").show();
+}
+
+var gallery, 
+el, 
+span,
+i, 
+page, 
+slides = [],
+advanceOnReddit = false;
 
 $(document).ready(function() {    
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, false);
     
-    var gallery, 
-    el, 
-    span,
-    i, 
-    page, 
-    slides = [],
-    advanceOnReddit = false;
 
-    _.templateSettings = {
-      interpolate : /\{\{(.+?)\}\}/g
-    };
     
     gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
 
-    // Load initial data
-    for (i = 0; i < 3; i++) {
-        page = i === 0 ? slides.length - 1 : i - 1;
-
-        el = $($('#gallery-page').html());
-        el.find("#htmlSpan").hide();
-        el.find("#gallery-img").hide();
-        $(gallery.masterPages[i]).append(el);
-
-        el.find("#gallery-img").load(function() {this.className='';}); 
-    }
+    resetSlides();
 
     var onlineMode = window.location.search != "?test";
     picFetcher = new reddit.PicFetcher({onlineMode: onlineMode, 
@@ -71,24 +90,38 @@ $(document).ready(function() {
                                         });
 
 
-    function updateStatus(consecutiveDiscarded, nsfwDiscarded, errorFetching) {        
+    function resetSettings() {
+        localStorage.clear();
+        showSettings();
+    }
+
+    function updateStatus(consecutiveDiscarded, nsfwDiscarded, errorFetching, endOfReddit) {        
         var statusHTML = "";
         if(errorFetching) {
-            statusHTML += "<p>" + errorFetching + " errors connecting to reddit.  Reload page or check settings to see if all reddits are correct.</p>";            
+            statusHTML += "<p>" + errorFetching + " errors connecting to reddit.  Reload page or check settings to see if all reddits are correct.</p>";
+            if(errorFetching===2) { statusHTML += "<p>Possible settings problem.  Will reset after two more errors</p>" }
+            if(errorFetching===4) {
+                resetSettings();
+            }                        
         }
         if(consecutiveDiscarded > 10) {
-            statusHTML += "<p>" + consecutiveDiscarded + " unshown items.  Maybe you have seen all of reddit.  Come back later or change settings.</p>";
+            statusHTML += "<p>" + consecutiveDiscarded + " unshown items.  Maybe you have seen all new posts on this subreddit.  Come back later or change settings.</p>";
         }
         if(nsfwDiscarded > 10) {
-            statusHTML += "<p>" + nsfwDiscarded + " NSFW skipped. Turn on in settings to view</p>";
+            statusHTML += "<p>" + nsfwDiscarded + " NSFW items skipped. Turn on in settings to view</p>";
         }
+
+        if(endOfReddit) {
+            statusHTML += "<p>You have reached the end of reddit!  There are no new items to display.  Try a new set of subreddits or refresh later.</p>";
+        }
+
         status = $("#loading-status").html(statusHTML);
     }
 
     function start() {
         subReddits = getSubreddits();
         if(subReddits.length) {
-            picFetcher.setSubreddits(subReddits);
+            picFetcher.setSubreddits(subReddits, localStorage["hnct-params"]);
         } else {
             showSettings();
         }
@@ -154,17 +187,6 @@ $(document).ready(function() {
     });
 
 
-    function getCurrentImage() { return($(gallery.masterPages[gallery.currentMasterPage]).find("#gallery-img")); }
-
-    function resetImageSize(img) {
-        img.width(img.data('orig-width'));
-        img.height(img.data('orig-height'));
-        var origTop = img.data('orig-top');
-        if (null !== origTop) {
-            img.offset({top: origTop});
-            img.data('orig-top', null);
-        }
-    }
 
     function advanceImg() {
         resetImageSize(getCurrentImage());
@@ -243,8 +265,12 @@ $(document).ready(function() {
     var seenPL = {}; // TODO: Remove(testing)
     function addSlide(slide) {
         if(slide.item.permalink){
-            if(seenPL[slide.item.permalink])
-                alert("!!!!!!!!!! DUPE PL!");
+            if(seenPL[slide.item.permalink]) {
+                if( window.location.toString().beginsWith("file://"))
+                   alert("!!!!!!!!!! DUPE PL!");
+                reddit.error("skipping aready seen PL")
+                return;
+            }
             seenPL[slide.item.permalink] = true;
         } // TODO: Remove(testing);
         
@@ -386,6 +412,7 @@ function setButtonData(params) {
 }
 
 var defaultParams = { 
+    "hnct-params": "hot",
     "nsfw-params":  "off",
 }
 
@@ -445,9 +472,10 @@ function saveSettings() {
         return;
     }
 
-    picFetcher.setSubreddits(subReddits);
+    picFetcher.setSubreddits(subReddits, settings["hnct-params"]);
     localStorage["storedSubreddits"] = JSON.stringify(subReddits);
 
     $("#settingsModal").modal("hide"); 
     respondToKeys = true;
+    resetSlides();
 }

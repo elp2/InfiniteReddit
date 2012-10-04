@@ -60,7 +60,7 @@ ASSUME_404_AFTER_MS = 4000;
         if (this.onlineMode) {
             this.seenPermalinks = getSeenPermalinks();
         } else {
-            this.seenURLs = {};
+            this.seenPermalinks = {};
         }
     }
     
@@ -78,8 +78,10 @@ ASSUME_404_AFTER_MS = 4000;
         this.afterTag = "";
         this.items = [];
         this.itemsIndex = 0;   
+        this.nsfwDiscarded = this.consecutiveDiscarded = this.fetchingErrors = this.endOfReddit = 0;
+        this.waitingForResponse = false;
+
         this.getMorePosts();     
-        this.nsfwDiscarded = this.consecutiveDiscarded = this.fetchingErrors = 0;
     };
 
     // Getting Posts
@@ -295,27 +297,32 @@ ASSUME_404_AFTER_MS = 4000;
     };
     
     PicFetcher.prototype.updateStatus = function() {
-        this.statusFn(this.consecutiveDiscarded, this.nsfwDiscarded, this.fetchingErrors);        
+        this.statusFn(this.consecutiveDiscarded, this.nsfwDiscarded, this.fetchingErrors, this.endOfReddit);        
     }
+
+    PicFetcher.prototype.handleListing = function(item) {
+        if (!item.data.over_18 || self.show_over_18) {
+            if (isImageFile(item.data.url)) {
+                this.appendImage(item.data);
+            } else {
+                this.enrichItem(item.data);
+            }
+            this.fetcherSawItem(item);
+        } else {
+            this.nsfwDiscarded++;
+        }
+    }    
 
     PicFetcher.prototype.handlePosts = function(data) {
         this.afterTag = data.data && data.data.after;
         if (!this.afterTag) {
-            reddit.error("TODO: No after tag.  You've reached the end of reddit!  Bad things will happen!");
+            this.endOfReddit = true;
+            return;
         }
         
         var self = this;
         $.each(data.data.children, function(i, item) {
-            if (!item.data.over_18 || self.show_over_18) {
-            	if (isImageFile(item.data.url)) {
-                    self.appendImage(item.data);
-                } else {
-                    self.enrichItem(item.data);
-                }
-                self.fetcherSawItem(item);
-            } else {
-                self.nsfwDiscarded++;
-            }
+            self.handleListing(item);
         });
         this.updateStatus();
         this.resetTimes();
