@@ -55,16 +55,22 @@ describe("Reddit.PicFetcher", function() {
   });
 
   it("properly blocks dupe items", function() {
-    spyOn( picFetcher, "appendImage");
-    
-    expect(picFetcher.haveSeenItem(imgItem)).toBeFalsy();
-    picFetcher.handleListing(imgItem);
-    expect(picFetcher.appendImage).toHaveBeenCalled();
-    expect(picFetcher.haveSeenItem(imgItem)).toBeTruthy();
-    expect(picFetcher.appendImage.calls.length).toEqual(1);
+    var types = [ [imgItem, "appendImage"], 
+    [htmlItem, "enrichItem"] ];
+    for(var ti in types) {
+      var item = types[ti][0].data;
+      var fn = types[ti][1];
+      spyOn( picFetcher, fn);
 
-    // Now show it again... should be blocked this time.
-    picFetcher.handleListing(imgItem);
-    expect(picFetcher.appendImage.calls.length).toEqual(1);
+      expect(picFetcher.haveSeenItem(item)).toBeFalsy();
+      picFetcher.handleListing(item);
+      expect(picFetcher[fn]).toHaveBeenCalled();
+      expect(picFetcher.haveSeenItem(item)).toBeTruthy();
+      expect(picFetcher[fn].calls.length).toEqual(1);
+
+      // Now show it again... should be blocked this time.
+      picFetcher.handleListing(item);
+      expect(picFetcher[fn].calls.length).toEqual(1);
+    }
   });
 });

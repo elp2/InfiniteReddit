@@ -144,10 +144,10 @@ ASSUME_404_AFTER_MS = 4000;
     
     var cumDelay=0;
     function testLoads(self, child) {
-                    cumDelay += TESTING_LOAD_DELAY_MS;
-                    var here = {data:{after:testingJsonData.data.after, children:[child]}};
-                    setTimeout(function() {self.handlePosts(here);}, cumDelay);
-                }
+        cumDelay += TESTING_LOAD_DELAY_MS;
+        var here = {data:{after:testingJsonData.data.after, children:[child]}};
+        setTimeout(function() {self.handlePosts(here);}, cumDelay);
+    }
 
     PicFetcher.prototype.fetchingError = function() {
         reddit.error("Error fetching from Reddit");
@@ -157,6 +157,7 @@ ASSUME_404_AFTER_MS = 4000;
         var self = this;
         setTimeout(function(){self.getMorePosts()}, 1.5*REDDIT_THROTTLE_MS);
     }
+
     PicFetcher.prototype._getMorePosts = function() {
         var self = this;
 
@@ -204,10 +205,6 @@ ASSUME_404_AFTER_MS = 4000;
         if (undefined === item || !item.url)
             return false;
         
-        if (this.haveSeenItem(item)) {
-            return false;
-        }
-                
         if (!isImageFile(item.url)) {
             reddit.log(item.url, ": is not an image", item);
             return false;
@@ -228,6 +225,7 @@ ASSUME_404_AFTER_MS = 4000;
     }
 
     PicFetcher.prototype.haveSeenItem = function(item) {
+        if(undefined===item.permalink) throw("No permalink on item!");
         return(undefined!==this.seenPermalinks[item.permalink]);
     };
 
@@ -270,9 +268,6 @@ ASSUME_404_AFTER_MS = 4000;
     };
     
     PicFetcher.prototype.enrichItem = function(data) {
-        if(this.haveSeenItem(data)) 
-            return;
-
         var self = this;
         var matches = [{prefixes: ["imgur.com"],fn: function() {
                     self.getImgurLinks(data);
@@ -280,7 +275,9 @@ ASSUME_404_AFTER_MS = 4000;
             {prefixes: ["qkme.me", "www.quickmeme.com", "quickmeme.com"],fn: function() {
                     self.getQuickMemeLink(data);
                 }}, 
-            {prefixes: ["youtube.com", "www.youtube.com", "youtu.be"], fn:function(){ self.getYoutubeLink(data);}}
+            {prefixes: ["youtube.com", "www.youtube.com", "youtu.be"], fn:function(){ 
+                self.getYoutubeLink(data);
+                }}
         ];
         
         for (var i = matches.length - 1; i >= 0; i--) {
@@ -301,11 +298,14 @@ ASSUME_404_AFTER_MS = 4000;
     }
 
     PicFetcher.prototype.handleListing = function(item) {
-        if (!item.data.over_18 || self.show_over_18) {
-            if (isImageFile(item.data.url)) {
-                this.appendImage(item.data);
+        if(this.haveSeenItem(item)) 
+            return;
+
+        if (!item.over_18 || self.show_over_18) {
+            if (isImageFile(item.url)) {
+                this.appendImage(item);
             } else {
-                this.enrichItem(item.data);
+                this.enrichItem(item);
             }
             this.fetcherSawItem(item);
         } else {
@@ -322,7 +322,7 @@ ASSUME_404_AFTER_MS = 4000;
         
         var self = this;
         $.each(data.data.children, function(i, item) {
-            self.handleListing(item);
+            self.handleListing(item.data);
         });
         this.updateStatus();
         this.resetTimes();
