@@ -1,5 +1,6 @@
 /*jshint browser:true, jquery:true, devel:true */
-/*global localStorage: false, _:false, REDDIT_THROTTLE_MS:false, TESTING_LOAD_DELAY_MS:false, testingJsonData: false */
+/*global localStorage: false, _:false, REDDIT_THROTTLE_MS:false, TESTING_LOAD_DELAY_MS:false, testingJsonData: false,
+ASSUME_404_AFTER_MS:false, IMAGES_BUFFER_LENGTH:false */
 
 _.templateSettings = {
   interpolate : /\{\{(.+?)\}\}/g
@@ -66,11 +67,11 @@ ASSUME_404_AFTER_MS = 4000;
     
     PicFetcher.prototype.setShow_over_18 = function(bool) {
         this.show_over_18 = bool;
-    }
+    };
 
     PicFetcher.prototype.setShow_Videos = function(bool) {
         this.show_videos = bool;
-    }
+    };
 
     PicFetcher.prototype.setSubreddits = function(subreddits, hnct) {
         this.subreddits = subreddits;
@@ -99,7 +100,7 @@ ASSUME_404_AFTER_MS = 4000;
 
     PicFetcher.prototype.shouldFetchMorePosts = function() {
         return(this.itemsIndex > this.items.length - IMAGES_BUFFER_LENGTH);
-    }
+    };
 
     PicFetcher.prototype.advance = function() {
         if(this.itemsIndex<=this.items.length-1) this.itemsIndex++;
@@ -107,11 +108,11 @@ ASSUME_404_AFTER_MS = 4000;
             reddit.log("getting more!", this.itemsIndex, "/", this.items.length);
             this.getMorePosts();
         }
-    }
+    };
 
     PicFetcher.prototype.retreat = function() {
         if(this.itemsIndex>0) this.itemsIndex--;
-    }
+    };
     
     PicFetcher.prototype.getMorePosts = function() {
         this.updateStatus();
@@ -140,7 +141,7 @@ ASSUME_404_AFTER_MS = 4000;
 
         reddit.log("Getting URL=", url);        
         return url;
-    }
+    };
     
     var cumDelay=0;
     function testLoads(self, child) {
@@ -155,8 +156,8 @@ ASSUME_404_AFTER_MS = 4000;
         this.updateStatus(); 
         this.resetTimes();
         var self = this;
-        setTimeout(function(){self.getMorePosts()}, 1.5*REDDIT_THROTTLE_MS);
-    }
+        setTimeout(function(){self.getMorePosts();}, 1.5*REDDIT_THROTTLE_MS);
+    };
 
     PicFetcher.prototype._getMorePosts = function() {
         var self = this;
@@ -172,7 +173,7 @@ ASSUME_404_AFTER_MS = 4000;
                 self.fetchingError();
             });
             // Check for 404's by using a timeout since we don't get any JSON callbacks since there's no JSON to inject into the page
-            setTimeout(function() { if(!success) { self.fetchingError() } }, ASSUME_404_AFTER_MS);
+            setTimeout(function() { if(!success) { self.fetchingError(); } }, ASSUME_404_AFTER_MS);
         } else {
             this.afterTag = "";
             for (var i = testingJsonData.data.children.length - 1; i >= 0; i--) {
@@ -215,14 +216,14 @@ ASSUME_404_AFTER_MS = 4000;
     // We only want to persist that we saw the item when the user sees the item.
     PicFetcher.prototype.userSawItem = function(item) {
         var permalink = item.permalink;
-        localStorage[permalink] = (new Date).getTime();
-    }
+        localStorage[permalink] = (new Date()).getTime();
+    };
 
     // Need to keep internal track of what item's the fetcher saw so it doesn't add them twice
     PicFetcher.prototype.fetcherSawItem = function(item) {
         var permalink = item.permalink;
         this.seenPermalinks[permalink] = true;
-    }
+    };
 
     PicFetcher.prototype.haveSeenItem = function(item) {
         if(undefined===item.permalink) throw("No permalink on item!");
@@ -246,7 +247,7 @@ ASSUME_404_AFTER_MS = 4000;
         }
         this.consecutiveDiscarded = 0;
         var self = this;
-       	// Insert preloaded image after it finishes loading via "load" callback
+        // Insert preloaded image after it finishes loading via "load" callback
         $('<img />')
         .attr('src', item.url)
         .load(function() {
@@ -295,13 +296,13 @@ ASSUME_404_AFTER_MS = 4000;
     
     PicFetcher.prototype.updateStatus = function() {
         this.statusFn(this.consecutiveDiscarded, this.nsfwDiscarded, this.fetchingErrors, this.endOfReddit);        
-    }
+    };
 
     PicFetcher.prototype.handleListing = function(item) {
         if(this.haveSeenItem(item)) 
             return;
 
-        if (!item.over_18 || self.show_over_18) {
+        if (!item.over_18 || this.show_over_18) {
             if (isImageFile(item.url)) {
                 this.appendImage(item);
             } else {
@@ -311,7 +312,7 @@ ASSUME_404_AFTER_MS = 4000;
         } else {
             this.nsfwDiscarded++;
         }
-    }    
+    };    
 
     PicFetcher.prototype.handlePosts = function(data) {
         this.afterTag = data.data && data.data.after;
@@ -368,15 +369,15 @@ ASSUME_404_AFTER_MS = 4000;
         if(!this.show_videos)
             return;
 
-    	var videoIdRe = /.*v=([^&]*)/,
-    		videoId = videoIdRe.exec(item.url)[1];
+        var videoIdRe = /.*v=([^&]*)/,
+            videoId = videoIdRe.exec(item.url)[1];
 
-    	if(videoId) {
-	    	var html = _.template($("#youtube-template").html())({videoId:videoId});
-	    	this.appendHtml(item, html);
-    	} else {
-    		reddit.error("Can't parse youtube video!!!", item.url);
-    	}
+        if(videoId) {
+            var html = _.template($("#youtube-template").html())({videoId:videoId});
+            this.appendHtml(item, html);
+        } else {
+            reddit.error("Can't parse youtube video!!!", item.url);
+        }
     };
 
     // Export
@@ -396,5 +397,5 @@ ASSUME_404_AFTER_MS = 4000;
         var args = jQuery.makeArray(arguments);
         args.unshift("(reddit)");
         console.error.apply(console, args);        
-    }
+    };
 }(window);
