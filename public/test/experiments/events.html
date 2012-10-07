@@ -55,7 +55,6 @@ item =
            //console.debug((new Date()));
 
             })
-            .error(function() { alert("TODO3: Handle Error getting JSON / end of reddit/etc show error page and keep retrying like on new image"); });
 */
 
 var defaultReddits = [ "All", "AdviceAnimals", "announcements", "AskReddit", "atheism", "aww", "bestof", "blog", "funny", "gaming", "IAmA", "movies", "Music", "pics", "politics", "science", "technology", "todayilearned", "videos", "worldnews", "WTF"]; // from /reddits 22Sep12
@@ -74,7 +73,6 @@ function typeaheadSource(query, cbFn) {
 }
 
 function subredditButton(subreddit) {
-	// TODO: Add a proper "x"
 	var button = $("<button />")
 	.addClass("btn")
 	.addClass("btn-mini")
@@ -174,7 +172,7 @@ function setParams(params) {
 		<div id="buttonsGoHere"></div>
 
 		<input type="text" data-provide="typeahead" id="subredditsTypeahead" placeholder="Enter Subreddits">
-		<button type="button" class="btn btn-small">Reset to defaults</button><!-- TODO: reset to defaults -->
+		<button type="button" class="btn btn-small">Reset to defaults</button>
 		<button type="button" class="btn btn=small" onClick="$.each( $('#buttonsGoHere').children(), function() {$(this).remove()} );">Clear</button>
 	</form>
 

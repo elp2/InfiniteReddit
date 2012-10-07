@@ -340,8 +340,6 @@ ASSUME_404_AFTER_MS = 4000;
                 var images = data.album && data.album.images;
                 if (!images)
                     return;
-
-            // TODO: actually add the album along with relevant titles/descriptions
             });
         } else { // normal image
             var url = "http://api.imgur.com/2/image/" + id + ".json";
