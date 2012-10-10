@@ -1,6 +1,8 @@
 var respondToKeys = true;
 
-var DETAILS_PADDING_PX = 70;
+var DETAILS_PADDING_PX = 60,
+    IMG_BORDER_PX = 5 * 2, 
+    EXTRA_SPACE_PX = 20;
 
 if(window.location.search == "?reset") {
     localStorage.clear();
@@ -136,6 +138,15 @@ $(document).ready(function() {
         details.html(_.template(detailsTemplate, item, {variable:"item"}));
     }
 
+    function offsetImg(img) {
+        if(img.height()>$(window).height()-DETAILS_PADDING_PX - EXTRA_SPACE_PX - IMG_BORDER_PX) {
+            img.offset({top:DETAILS_PADDING_PX});
+        } else {
+            var remainingSpace = $(window).height() - DETAILS_PADDING_PX;
+            img.offset({top:DETAILS_PADDING_PX + (remainingSpace - img.height() - IMG_BORDER_PX) / 2});
+        }
+    }
+
     function putSlideAt(upcoming, i) {
         var slide = slides[upcoming] ? slides[upcoming] : {width: 250,height: 250,item:{url: ""}};
         picFetcher.userSawItem(slide.item);
@@ -163,14 +174,8 @@ $(document).ready(function() {
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;          
-            /*
-            if(slide.height>$(window).height()-DETAILS_PADDING_PX) {
-                console.debug("OFFSET TOP: ", img, img.offset().top)
-                img.offset({top:DETAILS_PADDING_PX});
-            } else {
-            }
-            console.debug("IO TOP: ", img.offset().top);
-            */
+
+            offsetImg(img);
         } 
         setDetails(details, slide.item);
     }
@@ -282,6 +287,7 @@ $(document).ready(function() {
                     img.width(zoomedSize.width);
                     img.height(zoomedSize.height);
                 }
+                offsetImg(img);
                 break;
         }
     });
@@ -324,7 +330,7 @@ $(document).ready(function() {
 
         // Shrink things if doing so slightly will make them fit completely on the page
         var acceptableShrink = 0.5;
-        var maxHeight = $(window).height() - DETAILS_PADDING_PX;
+        var maxHeight = $(window).height() - DETAILS_PADDING_PX - IMG_BORDER_PX - EXTRA_SPACE_PX;
         if(forceShrink || (maxHeight < scaledHeight && maxHeight / scaledHeight > acceptableShrink)) {
             var newWidth = scaledWidth * (maxHeight / scaledHeight);
             if(newWidth<maxWidth) {

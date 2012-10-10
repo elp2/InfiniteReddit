@@ -66,6 +66,7 @@ body {
 }
 
 #swipeview-slider img {
+	position: relative;
 	display:block;
 	border:5px solid #eee;
 	-webkit-box-shadow:0 2px 6px #000;
