@@ -1,5 +1,7 @@
 var respondToKeys = true;
 
+var DETAILS_PADDING_PX = 70;
+
 if(window.location.search == "?reset") {
     localStorage.clear();
 }
@@ -150,6 +152,7 @@ $(document).ready(function() {
             htmlSpan.hide();
             htmlSpan.html("");
 
+
             img.show();
             img.attr('src', slide.url)
             .attr('className', 'loading')
@@ -159,6 +162,14 @@ $(document).ready(function() {
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;          
+
+            if(slide.height>$(window).height()-DETAILS_PADDING_PX) {
+                console.debug("OFFSET TOP: ", img, img.offset().top)
+                img.offset({top:DETAILS_PADDING_PX});
+            } else {
+                //img.offset({top:(window).height() - ( DETAILS_PADDING_PX + slide.height/2 )});                
+            }
+            console.debug("IO TOP: ", img.offset().top);
         } 
         setDetails(details, slide.item);
     }
@@ -212,7 +223,7 @@ $(document).ready(function() {
         var img = getCurrentImage();
 
         var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32,
-        leftCode = 37, rightCode = 39, downCode = 40;
+        leftCode = 37, upCode = 38, rightCode = 39, downCode = 40;
         switch (event.which) {
             case jCode:
             case aCode:
@@ -225,7 +236,21 @@ $(document).ready(function() {
             case leftCode:
                 retreatImg();
                 break;
-            
+
+            case upCode:
+                if (null === img.data('orig-top')) {
+                    img.data('orig-top', img.offset().top);
+                }
+                
+                if(img.offset().top === img.data('orig-top')) {
+                    retreatImg();
+                } else {
+                    img.offset({top: Math.min( (img.offset().top + $(window).height()/2),
+                                                img.data('orig-top')
+                    )});
+                }
+                break;
+
             case spaceCode:
             case downCode:
                 if (null === img.data('orig-top')) {
@@ -235,7 +260,7 @@ $(document).ready(function() {
                 var imgBottom = img.offset().top + img.height(), 
                 bottomOffScreen = $(window).height() < imgBottom;
                 if (bottomOffScreen) {
-                    img.offset({top: img.offset().top - $(window).height()});
+                    img.offset({top: img.offset().top - $(window).height()/2});
                 } else {
                     advanceImg();
                 }
@@ -297,8 +322,8 @@ $(document).ready(function() {
         var scaledHeight = img.height() * (scaledWidth / img.width());
 
         // Shrink things if doing so slightly will make them fit completely on the page
-        var acceptableShrink = 0.75;
-        var maxHeight = $(window).height() - 70*2;
+        var acceptableShrink = 0.5;
+        var maxHeight = $(window).height() - DETAILS_PADDING_PX;
         if(forceShrink || (maxHeight < scaledHeight && maxHeight / scaledHeight > acceptableShrink)) {
             var newWidth = scaledWidth * (maxHeight / scaledHeight);
             if(newWidth<maxWidth) {
@@ -451,6 +476,7 @@ function getModalSubreddits() {
 }
 
 function saveSettings() {
+
     $.each($("#formErrors").children(), function(){$(this).remove();});
 
     var settings = getButtonData(defaultParams);
@@ -476,4 +502,11 @@ function saveSettings() {
     $("#settingsModal").modal("hide"); 
     respondToKeys = true;
     resetSlides();
+
+    if($.support.fullscreen){ 
+        console.debug("FULLSCREEN!");
+        $('#wrapper').fullScreen();
+    } else {
+        console.debug("NOT FULLSCREEN!");
+    }
 }
