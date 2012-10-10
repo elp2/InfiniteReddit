@@ -12,9 +12,6 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load tasks from "grunt-sample" grunt plugin installed via Npm.
-  grunt.loadNpmTasks('grunt-sample');
-
   // Default task.
   grunt.registerTask('default', 'lint sample');
 

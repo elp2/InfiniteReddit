@@ -58,9 +58,9 @@ ASSUME_404_AFTER_MS = 4000;
         this.hnct = "";
         
         if (this.onlineMode) {
-            this.seenPermalinks = getSeenPermalinks();
+            this.seenUniques = getSeenUniques();
         } else {
-            this.seenPermalinks = {};
+            this.seenUniques = {};
         }
     }
     
@@ -212,31 +212,37 @@ ASSUME_404_AFTER_MS = 4000;
         return true;
     };
     
+    function itemUnique(item) {
+        var unique = item.html ? item.html : item.url;
+        if(undefined===unique) {
+            throw("No unique on ", item, "!");            
+        }
+        return(unique);
+    }
     // We only want to persist that we saw the item when the user sees the item.
     PicFetcher.prototype.userSawItem = function(item) {
-        var permalink = item.permalink;
-        localStorage[permalink] = (new Date()).getTime();
+        localStorage[itemUnique(item)] = (new Date()).getTime();
     };
 
     // Need to keep internal track of what item's the fetcher saw so it doesn't add them twice
     PicFetcher.prototype.fetcherSawItem = function(item) {
-        var permalink = item.permalink;
-        this.seenPermalinks[permalink] = true;
+        this.seenUniques[itemUnique(item)] = true;
     };
 
     PicFetcher.prototype.haveSeenItem = function(item) {
+
         if(undefined===item.permalink) throw("No permalink on item!");
-        return(undefined!==this.seenPermalinks[item.permalink]);
+        return(undefined!==this.seenUniques[itemUnique(item)]);
     };
 
-    function getSeenPermalinks() {
-        var permalinks = {};
+    function getSeenUniques() {
+        var uniques = {};
         
-        for (var permalink in localStorage) {
-            permalinks[permalink] = localStorage[permalink];
+        for (var unique in localStorage) {
+            uniques[unique] = localStorage[unique];
         }
         
-        return (permalinks);
+        return (uniques);
     }
         
     PicFetcher.prototype.appendImage = function(item) {
