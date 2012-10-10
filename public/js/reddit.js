@@ -34,7 +34,7 @@ TESTING_LOAD_DELAY_MS = 2,
 IMAGES_BUFFER_LENGTH = 10,
 ASSUME_404_AFTER_MS = 4000;
 
-!function(window) {
+(function(window) {
     'use strict';
 
     // Initial Setup
@@ -395,4 +395,4 @@ ASSUME_404_AFTER_MS = 4000;
         args.unshift("(reddit)");
         console.error.apply(console, args);        
     };
-}(window);
+})(window);

@@ -45,6 +45,7 @@ function resetImageSize(img) {
 
 function resetSlides() {
     slides = [];
+    function resetClassName() { this.className=''; }
     for (i = 0; i < 3; i++) {
         var masterPage = $(gallery.masterPages[i]);
         if(masterPage.children().length === 0) {
@@ -52,7 +53,7 @@ function resetSlides() {
             el.find("#htmlSpan").hide();
             el.find("#gallery-img").hide();
 
-            el.find("#gallery-img").load(function() {this.className='';}); 
+            el.find("#gallery-img").load(resetClassName); 
             masterPage.append(el);
         } else {
             masterPage.find("#htmlSpan").hide();
@@ -115,7 +116,7 @@ $(document).ready(function() {
             statusHTML += "<p>You have reached the end of reddit!  There are no new items to display.  Try a new set of subreddits or refresh later.</p>";
         }
 
-        status = $("#loading-status").html(statusHTML);
+        $("#loading-status").html(statusHTML);
     }
 
     function start() {
@@ -162,14 +163,14 @@ $(document).ready(function() {
             .data('orig-height', slide.height)
             .data('orig-top', null) // Need to set a null so that it can be persisted.  Can't data set undefined although it's the beginning state
             ;          
-
+            /*
             if(slide.height>$(window).height()-DETAILS_PADDING_PX) {
                 console.debug("OFFSET TOP: ", img, img.offset().top)
                 img.offset({top:DETAILS_PADDING_PX});
             } else {
-                //img.offset({top:(window).height() - ( DETAILS_PADDING_PX + slide.height/2 )});                
             }
             console.debug("IO TOP: ", img.offset().top);
+            */
         } 
         setDetails(details, slide.item);
     }
@@ -192,10 +193,10 @@ $(document).ready(function() {
     
     gallery.onMoveIn(function() {
         var className = gallery.masterPages[gallery.currentMasterPage].className;
-        /(^|\s)swipeview-active(\s|$)/.test(className) || (gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
+        if( !(/(^|\s)swipeview-active(\s|$)/.test(className)) ) {
+            gallery.masterPages[gallery.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active';            
+        }
     });
-
-
 
     function advanceImg() {
         resetImageSize(getCurrentImage());
@@ -436,7 +437,7 @@ function setButtonData(params) {
 
 var defaultParams = { 
     "hnct-params": "hot",
-    "nsfw-params":  "off",
+    "nsfw-params":  "off"
 };
 
 function getParams() {
@@ -503,10 +504,12 @@ function saveSettings() {
     respondToKeys = true;
     resetSlides();
 
+    /*
     if($.support.fullscreen){ 
         console.debug("FULLSCREEN!");
         $('#wrapper').fullScreen();
     } else {
         console.debug("NOT FULLSCREEN!");
     }
+    */
 }
