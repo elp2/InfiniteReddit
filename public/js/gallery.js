@@ -292,18 +292,7 @@ $(document).ready(function() {
         }
     });
     
-    var seenPL = {}; // TODO: Remove(testing)
     function addSlide(slide) {
-        if(slide.item.permalink){
-            if(seenPL[slide.item.permalink]) {
-                if( window.location.toString().beginsWith("file://"))
-                   alert("!!!!!!!!!! DUPE PL!");
-                reddit.error("skipping aready seen PL");
-                return;
-            }
-            seenPL[slide.item.permalink] = true;
-        } // TODO: Remove(testing);
-        
         $("#info-popup").hide();
 
         var newPageI = gallery.options.numberOfPages,
