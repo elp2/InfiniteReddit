@@ -104,8 +104,7 @@ $(document).ready(function() {
         var statusHTML = "";
         if(errorFetching) {
             statusHTML += "<p>" + errorFetching + " errors connecting to reddit.  Reload page or check settings to see if all reddits are correct.</p>";
-            if(errorFetching===2) { statusHTML += "<p>Possible settings problem.  Will reset after two more errors</p>"; }
-            if(errorFetching===4) { resetSettings(); }                        
+            if(errorFetching===2) { statusHTML += "<p>>More errors... perhaps reddit or your internet is down.  If not then try changing your settings by clicking the link below.</p>"; }
         }
         if(consecutiveDiscarded > 10) {
             statusHTML += "<p>" + consecutiveDiscarded + " unshown items.  Maybe you have seen all new posts on this subreddit.  Come back later or change settings.</p>";
