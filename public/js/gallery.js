@@ -139,10 +139,18 @@ $(document).ready(function() {
 
     function offsetImg(img) {
         if(img.height()>$(window).height()-DETAILS_PADDING_PX - EXTRA_SPACE_PX - IMG_BORDER_PX) {
-            img.offset({top:DETAILS_PADDING_PX});
+            img.offset({top:DETAILS_PADDING_PX });
         } else {
             var remainingSpace = $(window).height() - DETAILS_PADDING_PX;
             img.offset({top:DETAILS_PADDING_PX + (remainingSpace - img.height() - IMG_BORDER_PX) / 2});
+        }
+
+        // Firefox doesn't seem to take offset(left:) properly so use CSS.  This breaks other browsers
+        var leftOffset = ($(window).width()/2 - img.width()/2)+ "px"
+        if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            img.css({left: leftOffset});
+        } else {
+            img.offset({left: leftOffset});
         }
     }
 
