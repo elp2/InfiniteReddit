@@ -276,3 +276,10 @@ body {
 	border-collapse:separate;
 	border-spacing:20px 0px;
 }
+
+.github {
+	position: absolute; 
+	top: 0; 
+	right: 0; 
+	border: 0;
+}

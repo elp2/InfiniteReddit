@@ -226,9 +226,10 @@ $(document).ready(function() {
         gallery.prev();
     }
 
-
     $(document).keydown(function(event) {
         if (!respondToKeys)
+            return;
+        if(event.ctrlKey || event.altKey || event.metaKey)
             return;
         if(0===slides.length)
             return;
@@ -237,7 +238,8 @@ $(document).ready(function() {
 
         var jCode = 74, kCode = 75, lCode = 76, aCode = 65, sCode = 83, dCode = 68, spaceCode = 32,
         leftCode = 37, upCode = 38, rightCode = 39, downCode = 40;
-        switch (event.which) {
+
+        switch(event.which) {
             case jCode:
             case aCode:
             case rightCode:
@@ -453,6 +455,7 @@ function getParams() {
 }
 
 function showSettings() {
+    respondToKeys = false;
     var params = getParams();
     setButtonData(params);
 
