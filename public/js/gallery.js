@@ -46,6 +46,9 @@ function resetImageSize(img) {
 }
 
 function resetSlides() {
+    $("#swipeview-slider").remove();
+    gallery = new SwipeView('#wrapper', {numberOfPages: 0, loop: false});
+
     slides = [];
     function resetClassName() { this.className=''; }
     for (i = 0; i < 3; i++) {
@@ -78,11 +81,7 @@ $(document).ready(function() {
     document.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }, false);
-    
-
-    
-    gallery = new SwipeView('#wrapper', {numberOfPages: slides.length,loop: false});
-
+        
     resetSlides();
 
     var onlineMode = window.location.search != "?test";
@@ -482,7 +481,6 @@ function getModalSubreddits() {
 }
 
 function saveSettings() {
-
     $.each($("#formErrors").children(), function(){$(this).remove();});
 
     var settings = getButtonData(defaultParams);
@@ -508,13 +506,4 @@ function saveSettings() {
     $("#settingsModal").modal("hide"); 
     respondToKeys = true;
     resetSlides();
-
-    /*
-    if($.support.fullscreen){ 
-        console.debug("FULLSCREEN!");
-        $('#wrapper').fullScreen();
-    } else {
-        console.debug("NOT FULLSCREEN!");
-    }
-    */
 }
