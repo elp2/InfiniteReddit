@@ -191,9 +191,10 @@ $(document).ready(function() {
         slideIdx, 
         i;
         for (i = 0; i < 3; i++) {
-            slideIdx = gallery.masterPages[i].dataset.upcomingPageIndex;
-            if (slideIdx != gallery.masterPages[i].dataset.pageIndex) {
-                putSlideAt(slideIdx, i);
+            upcomingSlideIdx = gallery.masterPages[i].dataset.upcomingPageIndex;
+            
+            if (upcomingSlideIdx != gallery.masterPages[i].dataset.pageIndex) {
+                putSlideAt(upcomingSlideIdx, i); // update this page's content to the upcoming
             }
         }
     });
@@ -211,18 +212,20 @@ $(document).ready(function() {
 
     function advanceImg() {
         resetImageSize(getCurrentImage());
-        picFetcher.advance();
 
         if(!gallery.next()){
             advanceOnReddit = true;
             $("#info-popup").show();
+        } else {
+            picFetcher.advance();
         }
     }
 
     function retreatImg() {
         resetImageSize(getCurrentImage());
-        picFetcher.retreat();
-        gallery.prev();
+        if(gallery.prev()) {
+            picFetcher.retreat();
+        }
     }
 
     $(document).keydown(function(event) {
