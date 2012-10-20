@@ -230,7 +230,6 @@ ASSUME_404_AFTER_MS = 4000;
     };
 
     PicFetcher.prototype.haveSeenItem = function(item) {
-
         if(undefined===item.permalink) throw("No permalink on item!");
         return(undefined!==this.seenUniques[itemUnique(item)]);
     };
@@ -308,12 +307,12 @@ ASSUME_404_AFTER_MS = 4000;
             return;
 
         if (!item.over_18 || this.show_over_18) {
+            this.fetcherSawItem(item);
             if (isImageFile(item.url)) {
                 this.appendImage(item);
             } else {
                 this.enrichItem(item);
             }
-            this.fetcherSawItem(item);
         } else {
             this.nsfwDiscarded++;
         }
