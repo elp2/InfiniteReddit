@@ -123,7 +123,7 @@ var SwipeView = (function (window, document) {
 		page: 0,
 		pageIndex: 0,
 		customEvents: [],
-
+		
 		onFlip: function (fn) {
 			this.wrapper.addEventListener('swipeview-flip', fn, false);
 			this.customEvents.push(['flip', fn]);
@@ -177,27 +177,10 @@ var SwipeView = (function (window, document) {
 		updatePageCount: function (n) {
 			this.options.numberOfPages = n;
 			this.maxX = -this.options.numberOfPages * this.pageWidth + this.wrapperWidth;
+			this.resetMasterPages();
 		},
 		
-		goToPage: function (p) {
-			var i;
-
-			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
-			for (i=0; i<3; i++) {
-				className = this.masterPages[i].className;
-				/(^|\s)swipeview-loading(\s|$)/.test(className) || (this.masterPages[i].className = !className ? 'swipeview-loading' : className + ' swipeview-loading');
-			}
-			
-			p = p < 0 ? 0 : p > this.options.numberOfPages-1 ? this.options.numberOfPages-1 : p;
-			this.page = p;
-			this.pageIndex = p;
-			this.slider.style[transitionDuration] = '0s';
-			this.__pos(-p * this.pageWidth);
-
-			this.currentMasterPage = (this.page + 1) - Math.floor((this.page + 1) / 3) * 3;
-
-			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className + ' swipeview-active';
-
+		resetMasterPages: function() {
 			if (this.currentMasterPage === 0) {
 				this.masterPages[2].style.left = this.page * 100 - 100 + '%';
 				this.masterPages[0].style.left = this.page * 100 + '%';
@@ -222,14 +205,36 @@ var SwipeView = (function (window, document) {
 				this.masterPages[1].dataset.upcomingPageIndex = this.page === 0 ? this.options.numberOfPages-1 : this.page - 1;
 				this.masterPages[2].dataset.upcomingPageIndex = this.page;
 				this.masterPages[0].dataset.upcomingPageIndex = this.page == this.options.numberOfPages-1 ? 0 : this.page + 1;
+			}			
+		},
+		
+		goToPage: function (p) {
+			var i;
+
+			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
+			for (i=0; i<3; i++) {
+				className = this.masterPages[i].className;
+				/(^|\s)swipeview-loading(\s|$)/.test(className) || (this.masterPages[i].className = !className ? 'swipeview-loading' : className + ' swipeview-loading');
 			}
+			
+			p = p < 0 ? 0 : p > this.options.numberOfPages-1 ? this.options.numberOfPages-1 : p;
+			this.page = p;
+			this.pageIndex = p;
+			this.slider.style[transitionDuration] = '0s';
+			this.__pos(-p * this.pageWidth);
+
+			this.currentMasterPage = (this.page + 1) - Math.floor((this.page + 1) / 3) * 3;
+
+			this.masterPages[this.currentMasterPage].className = this.masterPages[this.currentMasterPage].className + ' swipeview-active';
+
+			this.resetMasterPages();
 			
 			this.__flip();
 		},
 		
 		next: function () {
 			if (!this.options.loop && this.x == this.maxX) return false;
-			
+
 			this.directionX = -1;
 			this.x -= 1;
 			this.__checkPosition();
@@ -415,7 +420,7 @@ var SwipeView = (function (window, document) {
 
 				pageFlipIndex = this.page + 1;
 			}
-
+			
 			// Add active class to current page
 			className = this.masterPages[this.currentMasterPage].className;
 			/(^|\s)swipeview-active(\s|$)/.test(className) || (this.masterPages[this.currentMasterPage].className = !className ? 'swipeview-active' : className + ' swipeview-active');
@@ -426,14 +431,13 @@ var SwipeView = (function (window, document) {
 			
 			pageFlipIndex = pageFlipIndex - Math.floor(pageFlipIndex / this.options.numberOfPages) * this.options.numberOfPages;
 			this.masterPages[pageFlip].dataset.upcomingPageIndex = pageFlipIndex;		// Index to be loaded in the newly flipped page
-
 			newX = -this.page * this.pageWidth;
 			
 			this.slider.style[transitionDuration] = Math.floor(500 * Math.abs(this.x - newX) / this.pageWidth) + 'ms';
 
 			// Hide the next page if we decided to disable looping
 			if (!this.options.loop) {
-				this.masterPages[pageFlip].style.visibility = newX === 0 /*|| newX == this.maxX*/ ? 'hidden' : '';
+				this.masterPages[pageFlip].style.visibility = newX === 0 || newX == this.maxX ? 'hidden' : '';
 			}
 
 			if (this.x == newX) {
