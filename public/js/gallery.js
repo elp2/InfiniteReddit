@@ -197,8 +197,16 @@ $(document).ready(function() {
                 putSlideAt(upcomingSlideIdx, i); // update this page's content to the upcoming
             }
         }
-    });
     
+        // When we flipped via a drag we need to let the picFetcher know
+        if(-1 == gallery.directionX) { // forwards
+            // TODO: handle case where we didn't actually advance
+            picFetcher.advance();
+        } else if(1 == gallery.directionX) {
+            picFetcher.retreat();
+        }
+    });
+
     gallery.onMoveOut(function() {
         gallery.masterPages[gallery.currentMasterPage].className = gallery.masterPages[gallery.currentMasterPage].className.replace(/(^|\s)swipeview-active(\s|$)/, '');
     });
