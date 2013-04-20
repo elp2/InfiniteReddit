@@ -492,6 +492,7 @@ function getModalSubreddits() {
 }
 
 function saveSettings() {
+    mixpanel.track("Saved settings");
     $.each($("#formErrors").children(), function(){$(this).remove();});
 
     var settings = getButtonData(defaultParams);
